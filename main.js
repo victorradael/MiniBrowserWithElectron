@@ -16,8 +16,9 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-
+  // window.loadFile("./index.html");
   window.loadURL(url);
+  0;
 }
 
 function toggleDevTolls() {
