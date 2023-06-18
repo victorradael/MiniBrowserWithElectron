@@ -14,6 +14,7 @@ function createWindow() {
     darkTheme: true,
     webPreferences: {
       nodeIntegration: true,
+      spellcheck: false,
     },
   });
   // window.loadFile("./index.html");
