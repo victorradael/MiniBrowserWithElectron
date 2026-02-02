@@ -87,6 +87,7 @@ function App() {
         setIsAlwaysOnTop(newState)
     }
 
+    const [pageTitle, setPageTitle] = useState('')
     const [loadError, setLoadError] = useState(null)
     const webviewRef = useRef(null)
 
@@ -99,14 +100,23 @@ function App() {
             setLoadError(e.errorDescription || 'Erro ao carregar a página. Verifique a URL ou sua conexão.')
         }
 
-        const handleStart = () => setLoadError(null)
+        const handleStart = () => {
+            setLoadError(null)
+            setPageTitle('Carregando...')
+        }
+
+        const handleTitle = (e) => {
+            setPageTitle(e.title)
+        }
 
         webview.addEventListener('did-fail-load', handleFail)
         webview.addEventListener('did-start-loading', handleStart)
+        webview.addEventListener('page-title-updated', handleTitle)
 
         return () => {
             webview.removeEventListener('did-fail-load', handleFail)
             webview.removeEventListener('did-start-loading', handleStart)
+            webview.removeEventListener('page-title-updated', handleTitle)
         }
     }, [currentUrl])
 
@@ -115,25 +125,32 @@ function App() {
         <div className="flex-1 flex flex-col h-full relative overflow-hidden">
             {/* Toolbar / Header for Browser View */}
             <div className="h-10 bg-gray-900 border-b border-gray-700 flex items-center px-4 justify-between draggable shrink-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
                     <button
                         onClick={() => {
                             setCurrentUrl('')
                             setLoadError(null)
                         }}
-                        className="p-1.5 hover:bg-gray-700 rounded text-gray-300 no-drag"
+                        className="p-1.5 hover:bg-gray-700 rounded text-gray-300 no-drag shrink-0"
                         title="Back to Dashboard"
                     >
                         <ArrowLeft size={16} />
                     </button>
-                    <div className="flex items-center gap-2">
-                        <div className="scale-75 origin-left">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <div className="scale-75 origin-left w-5 h-5 flex items-center justify-center shrink-0">
                             <PageIcon url={currentUrl} />
                         </div>
-                        <span className="text-sm text-gray-400 truncate max-w-[300px]">{currentUrl}</span>
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-gray-200 truncate leading-tight">
+                                {pageTitle || 'Navegador'}
+                            </span>
+                            <span className="text-[10px] text-gray-500 truncate leading-tight opacity-70">
+                                {currentUrl}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                     <button
                         onClick={toggleAlwaysOnTop}
                         className={`p-1.5 rounded no-drag ${isAlwaysOnTop ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-400'}`}
