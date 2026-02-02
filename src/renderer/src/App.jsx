@@ -3,27 +3,38 @@ import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, Sidebar
 
 const getFavicon = (url) => {
     try {
-        const origin = new URL(url).origin
-        return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${origin}&size=64`
+        const hostname = new URL(url).hostname
+        // DuckDuckGo favicon service is often more reliable for various subdomains
+        return `https://icons.duckduckgo.com/ip3/${hostname}.ico`
     } catch (e) {
         return null
     }
 }
 
 function PageIcon({ url }) {
-    const [error, setError] = useState(false)
-    const iconUrl = getFavicon(url)
+    const [status, setStatus] = useState('ddg') // ddg -> google -> error
 
-    if (error || !iconUrl) {
+    const hostname = (() => {
+        try { return new URL(url).hostname }
+        catch { return '' }
+    })()
+
+    const ddgUrl = `https://icons.duckduckgo.com/ip3/${hostname}.ico`
+    const googleUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
+
+    if (status === 'error' || !hostname) {
         return <Globe size={20} className="text-gray-600" />
     }
 
     return (
         <img
-            src={iconUrl}
+            src={status === 'ddg' ? ddgUrl : googleUrl}
             alt=""
             className="w-6 h-6 object-contain"
-            onError={() => setError(true)}
+            onError={() => {
+                if (status === 'ddg') setStatus('google')
+                else setStatus('error')
+            }}
         />
     )
 }
