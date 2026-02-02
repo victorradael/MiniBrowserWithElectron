@@ -49,15 +49,16 @@ Ao contrário de navegadores convencionais, o Mini Browser utiliza uma **Sidebar
 3.  Você pode **redimensionar** a barra puxando sua borda esquerda.
 4.  Faça login uma vez e suas senhas estarão sempre à mão para copiar e colar.
 
-## Construindo para Produção
+## ⚒️ Construção e Distribuição
 
-Para criar o executável instalável:
+Para gerar os instaláveis (`.deb`, `AppImage`) para Linux:
 
 ```bash
 yarn build:linux
-# ou para Windows (se estiver no Windows)
-yarn build
 ```
+
+Os arquivos serão gerados na pasta `dist/`. Para um guia detalhado de como instalar, executar e desinstalar a aplicação, veja o:
+👉 **[Guia de Instalação e Distribuição](file:///home/fomer/Documentos/github.com/victorradael/MiniBrowserWithElectron/INSTALL.md)**
 
 ## Licença
 
