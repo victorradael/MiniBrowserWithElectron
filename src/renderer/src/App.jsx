@@ -1,18 +1,49 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose } from 'lucide-react'
+import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
+
+const getFavicon = (url) => {
+    try {
+        const origin = new URL(url).origin
+        return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${origin}&size=64`
+    } catch (e) {
+        return null
+    }
+}
+
+function PageIcon({ url }) {
+    const [error, setError] = useState(false)
+    const iconUrl = getFavicon(url)
+
+    if (error || !iconUrl) {
+        return <Globe size={20} className="text-gray-600" />
+    }
+
+    return (
+        <img
+            src={iconUrl}
+            alt=""
+            className="w-6 h-6 object-contain"
+            onError={() => setError(true)}
+        />
+    )
+}
 
 function App() {
     const [urls, setUrls] = useState([])
+    const [loaded, setLoaded] = useState(false)
     const [currentUrl, setCurrentUrl] = useState('')
     const [newUrl, setNewUrl] = useState('')
     const [isAlwaysOnTop, setIsAlwaysOnTop] = useState(false)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+    const [newAlias, setNewAlias] = useState('')
+
     useEffect(() => {
         // Load saved URLs from electron-store
         const loadUrls = async () => {
             const saved = await window.api.getUrls()
-            setUrls(saved)
+            setUrls(saved || [])
+            setLoaded(true)
         }
         loadUrls()
 
@@ -21,11 +52,11 @@ function App() {
     }, [])
 
     useEffect(() => {
-        // Save URLs to electron-store whenever they change
-        if (urls.length > 0) { // Optional: prevent saving empty on init if logic requires
+        // Save URLs to electron-store whenever they change, but ONLY after initial load
+        if (loaded) {
             window.api.saveUrls(urls)
         }
-    }, [urls])
+    }, [urls, loaded])
 
     const addUrl = () => {
         if (!newUrl) return
@@ -34,12 +65,21 @@ function App() {
             urlToAdd = 'https://' + urlToAdd
         }
 
-        setUrls([...urls, { id: Date.now(), url: urlToAdd }])
+        setUrls([...urls, {
+            id: Date.now(),
+            url: urlToAdd,
+            alias: newAlias.trim()
+        }])
         setNewUrl('')
+        setNewAlias('')
     }
 
     const removeUrl = (id) => {
         setUrls(urls.filter(u => u.id !== id))
+    }
+
+    const cleanUrl = (url) => {
+        return url.replace(/^https?:\/\//i, '').replace(/\/$/, '')
     }
 
     const toggleAlwaysOnTop = async () => {
@@ -113,20 +153,29 @@ function App() {
 
                 <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 mb-8">
                     <h2 className="text-lg font-semibold mb-4 text-gray-200">Add New Page</h2>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newUrl}
-                            onChange={(e) => setNewUrl(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && addUrl()}
-                            placeholder="Enter URL (e.g. notion.so, google.com)"
-                            className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
-                        />
+                    <div className="flex flex-col gap-3">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newUrl}
+                                onChange={(e) => setNewUrl(e.target.value)}
+                                placeholder="Enter URL (e.g. google.com)"
+                                className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
+                            />
+                            <input
+                                type="text"
+                                value={newAlias}
+                                onChange={(e) => setNewAlias(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && addUrl()}
+                                placeholder="Alias (e.g. My Search)"
+                                className="w-1/3 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
+                            />
+                        </div>
                         <button
                             onClick={addUrl}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors w-full"
                         >
-                            Add
+                            Add to Dashboard
                         </button>
                     </div>
                 </div>
@@ -135,11 +184,20 @@ function App() {
                     {urls.map(item => (
                         <div key={item.id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center justify-between group hover:border-blue-500/50 transition-colors">
                             <div
-                                className="flex-1 cursor-pointer truncate mr-4"
+                                className="flex-1 cursor-pointer flex items-center gap-4 truncate mr-4"
                                 onClick={() => setCurrentUrl(item.url)}
                             >
-                                <h3 className="font-medium text-gray-200 truncate">{item.url}</h3>
-                                <p className="text-sm text-gray-500 mt-1">Click to open</p>
+                                <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center shrink-0 border border-gray-700 overflow-hidden">
+                                    <PageIcon url={item.url} />
+                                </div>
+                                <div className="truncate">
+                                    <h3 className="font-semibold text-gray-100 truncate">
+                                        {item.alias || cleanUrl(item.url)}
+                                    </h3>
+                                    <p className="text-xs text-gray-500 truncate">
+                                        {item.alias ? cleanUrl(item.url) : 'Click to open'}
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 onClick={() => removeUrl(item.id)}
@@ -160,6 +218,7 @@ function App() {
             </div>
         </div>
     )
+
 
     const [sidebarWidth, setSidebarWidth] = useState(350)
     const [isResizing, setIsResizing] = useState(false)
