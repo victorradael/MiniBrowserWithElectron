@@ -51,7 +51,8 @@
         "AppImage",
         "deb"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "resources/icon.png"
     },
     "files": [
       "out/**/*",

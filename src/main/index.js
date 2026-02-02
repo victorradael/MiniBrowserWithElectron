@@ -21,7 +21,7 @@ function createWindow() {
         autoHideMenuBar: true,
         frame: false, // Make the window frameless
         alwaysOnTop: true, // Default to true based on user requirement
-        ...(process.platform === 'linux' ? { icon } : {}),
+        icon,
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false,
