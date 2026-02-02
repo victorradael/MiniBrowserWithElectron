@@ -15,6 +15,7 @@ function createWindow() {
         height: 670,
         show: false,
         autoHideMenuBar: true,
+        frame: false, // Make the window frameless
         alwaysOnTop: true, // Default to true based on user requirement
         ...(process.platform === 'linux' ? { icon } : {}),
         webPreferences: {
@@ -63,6 +64,11 @@ function createWindow() {
     ipcMain.handle('save-urls', (_, urls) => {
         store.set('urls', urls)
         return true
+    })
+
+    // App Quit IPC
+    ipcMain.handle('quit-app', () => {
+        app.quit()
     })
 }
 

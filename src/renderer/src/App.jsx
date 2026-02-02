@@ -135,7 +135,7 @@ function App() {
     const renderDashboard = () => (
         <div className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
-                <header className="mb-8 flex items-center justify-between">
+                <header className="mb-8 flex items-center justify-between draggable">
                     <h1 className="text-2xl font-bold flex items-center gap-2">
                         <Monitor className="text-blue-500" />
                         Mini Browser
@@ -143,7 +143,7 @@ function App() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 flex items-center gap-2 transition-colors border border-gray-700"
+                            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 flex items-center gap-2 transition-colors border border-gray-700 no-drag"
                         >
                             <Shield size={16} className="text-blue-500" />
                             <span className="text-sm">Bitwarden</span>
@@ -247,8 +247,21 @@ function App() {
         }
     }, [isResizing])
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.ctrlKey && e.key === 'q') {
+                window.api.invoke('quit-app')
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [])
+
     return (
-        <div className="flex h-screen w-screen overflow-hidden bg-gray-900" style={{ cursor: isResizing ? 'col-resize' : 'default' }}>
+        <div className="flex h-screen w-screen overflow-hidden bg-gray-900 border border-gray-700 relative" style={{ cursor: isResizing ? 'col-resize' : 'default' }}>
+            {/* Global Invisible Drag Handle for easy window movement */}
+            <div className="fixed top-0 left-0 right-0 h-1 z-[9999] draggable pointer-events-none"></div>
+
             {/* Main Content Area (Dashboard or Browser) */}
             {currentUrl ? renderBrowser() : renderDashboard()}
 
@@ -264,13 +277,13 @@ function App() {
                         onMouseDown={() => setIsResizing(true)}
                     ></div>
 
-                    <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-3 shrink-0">
+                    <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-3 shrink-0 draggable">
                         <span className="text-sm font-semibold text-gray-200 flex items-center gap-2">
                             <Shield size={14} className="text-blue-500" /> Bitwarden Vault
                         </span>
                         <button
                             onClick={() => setIsSidebarOpen(false)}
-                            className="text-gray-400 hover:text-white"
+                            className="text-gray-400 hover:text-white no-drag"
                         >
                             <SidebarClose size={16} />
                         </button>
@@ -285,6 +298,11 @@ function App() {
                     </div>
                 </div>
             )}
+
+            {/* Watermark Helper - Moved to Bottom Left */}
+            <div className="fixed bottom-4 left-4 text-[10px] text-gray-600 pointer-events-none select-none uppercase tracking-widest bg-gray-900/50 px-2 py-1 rounded border border-gray-800/50 z-[100]">
+                Ctrl + Q para fechar
+            </div>
         </div>
     )
 }
