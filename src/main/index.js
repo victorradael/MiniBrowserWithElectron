@@ -8,6 +8,10 @@ import fs from 'fs'
 
 const store = new Store()
 
+// Suppress some noisy Electron/Chromium logs on Linux
+app.commandLine.appendSwitch('log-level', '3')
+app.commandLine.appendSwitch('disable-gpu-process-crash-log')
+
 function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({

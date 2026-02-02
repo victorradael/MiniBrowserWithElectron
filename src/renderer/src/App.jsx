@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
 
 const getFavicon = (url) => {
@@ -87,6 +87,29 @@ function App() {
         setIsAlwaysOnTop(newState)
     }
 
+    const [loadError, setLoadError] = useState(null)
+    const webviewRef = useRef(null)
+
+    useEffect(() => {
+        const webview = webviewRef.current
+        if (!webview) return
+
+        const handleFail = (e) => {
+            console.error('Webview failed to load:', e)
+            setLoadError(e.errorDescription || 'Erro ao carregar a página. Verifique a URL ou sua conexão.')
+        }
+
+        const handleStart = () => setLoadError(null)
+
+        webview.addEventListener('did-fail-load', handleFail)
+        webview.addEventListener('did-start-loading', handleStart)
+
+        return () => {
+            webview.removeEventListener('did-fail-load', handleFail)
+            webview.removeEventListener('did-start-loading', handleStart)
+        }
+    }, [currentUrl])
+
     // Main Browser View Layout
     const renderBrowser = () => (
         <div className="flex-1 flex flex-col h-full relative overflow-hidden">
@@ -94,7 +117,10 @@ function App() {
             <div className="h-10 bg-gray-900 border-b border-gray-700 flex items-center px-4 justify-between draggable shrink-0">
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setCurrentUrl('')}
+                        onClick={() => {
+                            setCurrentUrl('')
+                            setLoadError(null)
+                        }}
                         className="p-1.5 hover:bg-gray-700 rounded text-gray-300 no-drag"
                         title="Back to Dashboard"
                     >
@@ -121,7 +147,24 @@ function App() {
             </div>
             {/* Browser Content */}
             <div className="flex-1 w-full bg-white relative">
+                {loadError && (
+                    <div className="absolute inset-0 z-10 bg-gray-900 flex flex-col items-center justify-center p-8 text-center">
+                        <Monitor size={48} className="text-red-500 mb-4 opacity-50" />
+                        <h2 className="text-xl font-bold text-gray-100 mb-2">Ops! Não conseguimos chegar lá.</h2>
+                        <p className="text-gray-400 max-w-md mb-6">{loadError}</p>
+                        <button
+                            onClick={() => {
+                                const webview = webviewRef.current
+                                if (webview) webview.reload()
+                            }}
+                            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium"
+                        >
+                            Tentar Novamente
+                        </button>
+                    </div>
+                )}
                 <webview
+                    ref={webviewRef}
                     src={currentUrl}
                     className="w-full h-full"
                     allowpopups="true"
