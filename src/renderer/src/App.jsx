@@ -126,7 +126,12 @@ function App() {
                     >
                         <ArrowLeft size={16} />
                     </button>
-                    <span className="text-sm text-gray-400 truncate max-w-[300px]">{currentUrl}</span>
+                    <div className="flex items-center gap-2">
+                        <div className="scale-75 origin-left">
+                            <PageIcon url={currentUrl} />
+                        </div>
+                        <span className="text-sm text-gray-400 truncate max-w-[300px]">{currentUrl}</span>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
