@@ -17,7 +17,7 @@
     "browser",
     "productivity"
   ],
-  "author": "Victor Radael",
+  "author": "Victor Radael <victorradael@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
