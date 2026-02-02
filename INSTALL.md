@@ -2,17 +2,18 @@
 
 Este documento descreve como gerar os instaláveis do Mini Browser e como instalá-lo em sistemas Linux.
 
-## 🛠️ Gerando os Instaláveis (Build)
+## ⬇️ Download e Instalação (Recomendado)
 
-Para criar os pacotes de distribuição (como `.deb` e `AppImage`), execute o comando abaixo:
+A maneira mais fácil de instalar é baixando a versão mais recente na página de **Releases** do GitHub:
 
-```bash
-yarn build:linux
-```
+👉 **[Baixar última versão (Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest)**
 
-Após a conclusão, os arquivos serão gerados na pasta `dist/`.
+1. Baixe o arquivo `.deb` (para instalação) ou `.AppImage` (para execução direta).
+2. Siga as instruções de instalação abaixo.
 
 ---
+
+## 🛠️ Gerando os Instaláveis Localmente (Desenvolvimento)
 
 ## 📦 Instalação (Ubuntu/Debian)
 

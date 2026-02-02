@@ -51,14 +51,10 @@ Ao contrário de navegadores convencionais, o Mini Browser utiliza uma **Sidebar
 
 ## ⚒️ Construção e Distribuição
 
-Para gerar os instaláveis (`.deb`, `AppImage`) para Linux:
+Para usuários, recomendamos baixar o instalador diretamente das **Releases**:
+👉 **[Baixar Mini Browser (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
 
-```bash
-yarn build:linux
-```
-
-Os arquivos serão gerados na pasta `dist/`. Para um guia detalhado de como instalar, executar e desinstalar a aplicação, veja o:
-👉 **[Guia de Instalação e Distribuição](file:///home/fomer/Documentos/github.com/victorradael/MiniBrowserWithElectron/INSTALL.md)**
+Se você é desenvolvedor e deseja gerar os instaláveis manualmente:
 
 ## Licença
 
