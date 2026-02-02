@@ -1,0 +1,233 @@
+import { useState, useEffect } from 'react'
+import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose } from 'lucide-react'
+
+function App() {
+    const [urls, setUrls] = useState([])
+    const [currentUrl, setCurrentUrl] = useState('')
+    const [newUrl, setNewUrl] = useState('')
+    const [isAlwaysOnTop, setIsAlwaysOnTop] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+    useEffect(() => {
+        // Load saved URLs from electron-store
+        const loadUrls = async () => {
+            const saved = await window.api.getUrls()
+            setUrls(saved)
+        }
+        loadUrls()
+
+        // Check initial Always On Top state
+        window.api?.getAlwaysOnTop().then(setIsAlwaysOnTop)
+    }, [])
+
+    useEffect(() => {
+        // Save URLs to electron-store whenever they change
+        if (urls.length > 0) { // Optional: prevent saving empty on init if logic requires
+            window.api.saveUrls(urls)
+        }
+    }, [urls])
+
+    const addUrl = () => {
+        if (!newUrl) return
+        let urlToAdd = newUrl
+        if (!/^https?:\/\//i.test(urlToAdd)) {
+            urlToAdd = 'https://' + urlToAdd
+        }
+
+        setUrls([...urls, { id: Date.now(), url: urlToAdd }])
+        setNewUrl('')
+    }
+
+    const removeUrl = (id) => {
+        setUrls(urls.filter(u => u.id !== id))
+    }
+
+    const toggleAlwaysOnTop = async () => {
+        const newState = await window.api.toggleAlwaysOnTop()
+        setIsAlwaysOnTop(newState)
+    }
+
+    // Main Browser View Layout
+    const renderBrowser = () => (
+        <div className="flex-1 flex flex-col h-full relative overflow-hidden">
+            {/* Toolbar / Header for Browser View */}
+            <div className="h-10 bg-gray-900 border-b border-gray-700 flex items-center px-4 justify-between draggable shrink-0">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setCurrentUrl('')}
+                        className="p-1.5 hover:bg-gray-700 rounded text-gray-300 no-drag"
+                        title="Back to Dashboard"
+                    >
+                        <ArrowLeft size={16} />
+                    </button>
+                    <span className="text-sm text-gray-400 truncate max-w-[300px]">{currentUrl}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={toggleAlwaysOnTop}
+                        className={`p-1.5 rounded no-drag ${isAlwaysOnTop ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-400'}`}
+                        title="Toggle Always on Top"
+                    >
+                        {isAlwaysOnTop ? <Pin size={16} /> : <PinOff size={16} />}
+                    </button>
+                    <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className={`p-1.5 rounded no-drag ${isSidebarOpen ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 text-gray-400'}`}
+                        title="Toggle Bitwarden Sidebar"
+                    >
+                        {isSidebarOpen ? <SidebarClose size={16} /> : <Shield size={16} />}
+                    </button>
+                </div>
+            </div>
+            {/* Browser Content */}
+            <div className="flex-1 w-full bg-white relative">
+                <webview
+                    src={currentUrl}
+                    className="w-full h-full"
+                    allowpopups="true"
+                    useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                ></webview>
+            </div>
+        </div>
+    )
+
+    // Dashboard View Layout (When no URL is selected)
+    const renderDashboard = () => (
+        <div className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+                <header className="mb-8 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold flex items-center gap-2">
+                        <Monitor className="text-blue-500" />
+                        Mini Browser
+                    </h1>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 flex items-center gap-2 transition-colors border border-gray-700"
+                        >
+                            <Shield size={16} className="text-blue-500" />
+                            <span className="text-sm">Bitwarden</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 mb-8">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-200">Add New Page</h2>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={newUrl}
+                            onChange={(e) => setNewUrl(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addUrl()}
+                            placeholder="Enter URL (e.g. notion.so, google.com)"
+                            className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
+                        />
+                        <button
+                            onClick={addUrl}
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                        >
+                            Add
+                        </button>
+                    </div>
+                </div>
+
+                <div className="grid gap-4">
+                    {urls.map(item => (
+                        <div key={item.id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center justify-between group hover:border-blue-500/50 transition-colors">
+                            <div
+                                className="flex-1 cursor-pointer truncate mr-4"
+                                onClick={() => setCurrentUrl(item.url)}
+                            >
+                                <h3 className="font-medium text-gray-200 truncate">{item.url}</h3>
+                                <p className="text-sm text-gray-500 mt-1">Click to open</p>
+                            </div>
+                            <button
+                                onClick={() => removeUrl(item.id)}
+                                className="p-2 text-gray-500 hover:text-red-400 hover:bg-gray-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                title="Remove"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                    ))}
+
+                    {urls.length === 0 && (
+                        <div className="text-center py-12 text-gray-500">
+                            No pages added yet. Add one above!
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+
+    const [sidebarWidth, setSidebarWidth] = useState(350)
+    const [isResizing, setIsResizing] = useState(false)
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isResizing) return
+            const newWidth = window.innerWidth - e.clientX
+            if (newWidth > 250 && newWidth < 800) {
+                setSidebarWidth(newWidth)
+            }
+        }
+
+        const handleMouseUp = () => {
+            setIsResizing(false)
+        }
+
+        if (isResizing) {
+            window.addEventListener('mousemove', handleMouseMove)
+            window.addEventListener('mouseup', handleMouseUp)
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove)
+            window.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [isResizing])
+
+    return (
+        <div className="flex h-screen w-screen overflow-hidden bg-gray-900" style={{ cursor: isResizing ? 'col-resize' : 'default' }}>
+            {/* Main Content Area (Dashboard or Browser) */}
+            {currentUrl ? renderBrowser() : renderDashboard()}
+
+            {/* Bitwarden Sidebar */}
+            {isSidebarOpen && (
+                <div
+                    className="border-l border-gray-700 flex flex-col bg-white shrink-0 shadow-xl z-50 relative"
+                    style={{ width: sidebarWidth }}
+                >
+                    {/* Resizer Handle */}
+                    <div
+                        className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500 transition-colors z-50"
+                        onMouseDown={() => setIsResizing(true)}
+                    ></div>
+
+                    <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-3 shrink-0">
+                        <span className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                            <Shield size={14} className="text-blue-500" /> Bitwarden Vault
+                        </span>
+                        <button
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="text-gray-400 hover:text-white"
+                        >
+                            <SidebarClose size={16} />
+                        </button>
+                    </div>
+                    <div className="flex-1 relative">
+                        <webview
+                            src="https://vault.bitwarden.com"
+                            className="w-full h-full"
+                            useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                            allowpopups="true"
+                        ></webview>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
+export default App
