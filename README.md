@@ -1,62 +1,56 @@
-# Mini Browser With Electron (v2.0)
+# 🖥️ Mini Browser (v2.0)
 
-Um navegador minimalista focado em produtividade. Permite criar "Workspaces" (lista de URLs salvas) e manter a janela sempre no topo ("Always on Top") para facilitar o trabalho com referência cruzada. Inclui uma integração nativa com o Bitwarden via barra lateral.
+Um navegador minimalista, elegante e focado em produtividade. O Mini Browser foi desenhado para ser uma ferramenta de referência leve, mantendo-se sempre à mão enquanto você trabalha em outras tarefas.
 
-**Stack Tecnológica:**
-- **Core:** Electron
-- **Tools:** Vite + electron-vite
-- **UI:** React + TailwindCSS + Lucide Icons
-- **Persistence:** electron-store
+---
 
-## Funcionalidades
+## ✨ Identidade Visual e Experiência
+O Mini Browser abandona o visual de navegador padrão para uma experiência de aplicativo nativo moderno:
+- **Janela Frameless**: Interface sem bordas ou barras de título do sistema, maximizando o espaço de conteúdo.
+*   **Identidade Minimalista**: Ícone personalizado "Monitor" que reflete a proposta de ser sua segunda tela de trabalho.
+*   **Favicons Inteligentes**: O cabeçalho e o dashboard exibem automaticamente os ícones dos sites (favicons) com sistema de fallback resiliente.
+*   **Título Dinâmico**: O cabeçalho se comporta como uma aba inteligente, atualizando o título conforme você navega.
 
-- **Dashboard:** Gerencie suas URLs favoritas de forma persistente.
-- **Always on Top:** Mantenha a janela visível sobre outras aplicações com um clique.
-- **Bitwarden Sidebar:** Barra lateral retrátil e redimensional para gerenciar suas senhas via Bitwarden Web Vault.
-- **Modo Escuro:** Interface otimizada para conforto visual e produtividade.
+## 🚀 Funcionalidades Principais
+- **Dashboard de Workspaces**: Salve e organize suas URLs frequentes com apelidos (aliases) personalizados.
+- **Always on Top**: Fixe a janela sobre outros aplicativos com um clique para referência contínua.
+- **Bitwarden Sidebar**: Gerenciador de senhas integrado via barra lateral redimensionável.
+- **Elegant Error Handling**: Tela de erro customizada para conexões falhas ou URLs inválidas.
+- **Atalhos Rápidos**: Feche instantaneamente a aplicação com `Ctrl + Q`.
 
-## Começando
+---
 
-### Pré-requisitos
-- Node.js (v18+)
-- Yarn (recomendado) ou NPM
+## 🛠️ Stack Tecnológica
+- **Engine**: Electron + Chromium
+- **Frontend**: React + Vite
+- **Estilização**: Tailwind CSS (Modern Dark Theme)
+- **Ícones**: Lucide Icons + Google/DuckDuckGo Favicon Services
+- **Persistência**: `electron-store` (JSON-based persistence)
 
-### Instalação e Execução
+## 📦 Começando
 
-1.  Clone o repositório:
+### Instalação para Usuários
+Recomendamos baixar a versão oficial compilada para evitar necessidade de compilação:
+👉 **[Baixar última versão (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
+
+### Para Desenvolvedores
+1.  **Clone e Instale**:
     ```bash
     git clone https://github.com/victorradael/MiniBrowserWithElectron
     cd MiniBrowserWithElectron
-    ```
-2.  Instale as dependências:
-    ```bash
     yarn
-    # ou
-    npm install
     ```
-3.  Inicie a aplicação:
-    ```bash
-    yarn dev
-    # ou
-    npm run dev
-    ```
+2.  **Desenvolvimento**: `yarn dev`
+3.  **Build Local**: `yarn build:linux`
 
-## Utilização do Bitwarden
+---
 
-Ao contrário de navegadores convencionais, o Mini Browser utiliza uma **Sidebar de Web Vault** em vez de extensões pesadas:
-1.  Clique no ícone de **Escudo (Shield)** ou no botão **Bitwarden**.
-2.  Uma barra lateral abrirá à direita carregando o Vault oficial.
-3.  Você pode **redimensionar** a barra puxando sua borda esquerda.
-4.  Faça login uma vez e suas senhas estarão sempre à mão para copiar e colar.
+## 🔐 Integração com Bitwarden
+Em vez de extensões complexas, usamos o **Web Vault** oficial em uma sidebar:
+1.  Abra a sidebar pelo ícone de **Escudo** ou botão na Dashboard.
+2.  Redimensione a largura puxando a borda lateral.
+3.  Suas credenciais estarão sempre à mão para copiar/colar de forma segura.
 
-## ⚒️ Construção e Distribuição
-
-Para usuários, recomendamos baixar o instalador diretamente das **Releases**:
-👉 **[Baixar Mini Browser (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
-
-Se você é desenvolvedor e deseja gerar os instaláveis manualmente:
-
-## Licença
-
-Este projeto está licenciado sob a licença MIT. 
+## 📄 Licença
+Este projeto está licenciado sob a licença MIT. Criado por Victor Radael.
 
