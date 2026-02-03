@@ -37,11 +37,23 @@ parse_json() {
 }
 
 echo "Fetching latest release information..."
-RELEASE_DATA=$(curl -s $GITHUB_API)
+RELEASE_RESPONSE=$(curl -s -w "%{http_code}" $GITHUB_API)
+HTTP_CODE="${RELEASE_RESPONSE:${#RELEASE_RESPONSE}-3}"
+RELEASE_DATA="${RELEASE_RESPONSE:0:${#RELEASE_RESPONSE}-3}"
+
+if [ "$HTTP_CODE" -eq 404 ]; then
+    echo "Error: No releases found for $REPO."
+    echo "Please ensure you have created at least one release on GitHub."
+    exit 1
+elif [ "$HTTP_CODE" -ne 200 ]; then
+    echo "Error: GitHub API returned status code $HTTP_CODE."
+    exit 1
+fi
+
 VERSION=$(parse_json ".tag_name")
 
 if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
-    echo "Error: Could not find any releases for $REPO."
+    echo "Error: Could not extract version from GitHub API response."
     exit 1
 fi
 
