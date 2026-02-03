@@ -59,6 +59,41 @@ curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectro
 2.  **Desenvolvimento**: `yarn dev`
 3.  **Build Local**: `yarn build:linux`
 
+### 🐧 Solução de Problemas (Linux)
+Se ao rodar `yarn dev` você encontrar o erro `FATAL:setuid_sandbox_host.cc`, você tem duas opções:
+
+#### 1. Solução Rápida (Bypass)
+Execute o comando ignorando o sandbox:
+```bash
+yarn dev:no-sandbox
+```
+
+#### 2. Solução Definitiva (Permissões do Kernel)
+O erro ocorre porque muitas distribuições Linux desativam "unprivileged user namespaces" por segurança. Você pode habilitar temporariamente:
+```bash
+sudo sysctl -w kernel.unprivileged_userns_clone=1
+```
+Ou tornar permanente adicionando `kernel.unprivileged_userns_clone=1` em `/etc/sysctl.d/99-sysctl.conf`.
+
+#### 3. Diagnóstico Avançado
+Se mesmo após o passo acima o erro persistir, verifique estes pontos:
+
+*   **Limite de Namespaces**: Verifique se o limite não é zero:
+    ```bash
+    sysctl user.max_user_namespaces
+    ```
+    (Idealmente superior a 10000).
+*   **Restrições de AppArmor (Ubuntu 24.04+)**: Algumas distros bloqueiam namespaces para apps não-profileados:
+    ```bash
+    # Para testar se o AppArmor está bloqueando:
+    sudo dmesg | grep apparmor | grep -i "sandbox"
+    # Para desativar a restrição (temporário):
+    sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+    ```
+
+> [!CAUTION]
+> **Segurança**: Desativar o sandbox ou alterar parâmetros do Kernel reduz o isolamento do sistema. Consulte o [Guia de Instalação](file:///home/radael/Documents/github.com/victorradael/MiniBrowserWithElectron/INSTALL.md#considerações-de-segurança) para entender as implicações antes de aplicar estas mudanças permanentemente.
+
 ---
 
 ## 🔐 Integração com Bitwarden

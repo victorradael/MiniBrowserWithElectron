@@ -53,3 +53,39 @@ Para remover os arquivos temporários de build:
 ```bash
 rm -rf dist/ out/
 ```
+
+---
+
+## 🐧 Solução de Problemas (Linux Sandbox)
+
+Se o aplicativo falhar ao iniciar com erro de "SUID sandbox helper", você pode:
+
+1. **Rodar sem sandbox (Rápido)**: 
+   Adicione `--no-sandbox` ao comando de execução.
+
+2. **Habilitar no Kernel (Recomendado)**:
+   ```bash
+   sudo sysctl -w kernel.unprivileged_userns_clone=1
+   ```
+
+3. **Verificar Limites e AppArmor**:
+   *   Certifique-se que `user.max_user_namespaces` não é 0.
+   *   Se estiver no Ubuntu 24.04+, pode ser necessário:
+       ```bash
+       sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+       ```
+
+---
+
+## 🔐 Considerações de Segurança
+
+Ao utilizar os comandos acima para resolver problemas de sandbox no Linux, esteja ciente das implicações:
+
+| Comando / Flag | Risco | Recomendação |
+| :--- | :--- | :--- |
+| `--no-sandbox` | Remove o isolamento entre o conteúdo web e seu sistema. | Use apenas para desenvolvimento e com URLs confiáveis. |
+| `unprivileged_userns_clone` | Aumenta a superfície de ataque para exploits de Kernel. | Necessário para Docker/Flatpak; mantenha habilitado se usar essas ferramentas. |
+| `apparmor_restrict_unprivileged_userns` | Remove uma trava específica do Ubuntu contra exploits de privilégio. | Prefira habilitar perfis específicos do AppArmor se estiver em ambiente de produção. |
+
+> [!IMPORTANT]
+> O sandbox é a defesa primária do navegador contra sites maliciosos. Nunca navegue em sites desconhecidos com a flag `--no-sandbox` ativa.

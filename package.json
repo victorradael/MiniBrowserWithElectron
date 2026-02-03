@@ -7,6 +7,7 @@
   "scripts": {
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
+    "dev:no-sandbox": "electron-vite dev --noSandbox",
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:linux": "electron-vite build && electron-builder --linux",
