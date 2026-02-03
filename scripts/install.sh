@@ -63,12 +63,12 @@ echo "Latest version found: $VERSION"
 DEB_URL=$(parse_json ".assets[] | select(.name | endswith(\".deb\")) | .browser_download_url")
 APPIMAGE_URL=$(parse_json ".assets[] | select(.name | endswith(\".AppImage\")) | .browser_download_url")
 
-if [ -n "$DEB_URL" ]; then
+if [ -n "$APPIMAGE_URL" ]; then
+    echo "Found .AppImage package (preferred for better icon support)."
+    INSTALL_TYPE="appimage"
+elif [ -n "$DEB_URL" ]; then
     echo "Found .deb package."
     INSTALL_TYPE="deb"
-elif [ -n "$APPIMAGE_URL" ]; then
-    echo "Found .AppImage package."
-    INSTALL_TYPE="appimage"
 else
     echo "Error: No suitable Linux binaries (.deb or .AppImage) found in the latest release."
     exit 1
@@ -77,11 +77,7 @@ fi
 TEMP_DIR=$(mktemp -d)
 cd "$TEMP_DIR"
 
-if [ "$INSTALL_TYPE" == "deb" ]; then
-    echo "Downloading and installing .deb package..."
-    curl -L "$DEB_URL" -o mini-browser.deb
-    sudo apt-get update && sudo apt-get install -y ./mini-browser.deb
-elif [ "$INSTALL_TYPE" == "appimage" ]; then
+if [ "$INSTALL_TYPE" == "appimage" ]; then
     echo "Downloading and setting up .AppImage..."
     curl -L "$APPIMAGE_URL" -o MiniBrowser.AppImage
     chmod +x MiniBrowser.AppImage
@@ -89,24 +85,33 @@ elif [ "$INSTALL_TYPE" == "appimage" ]; then
     sudo mkdir -p /opt/mini-browser
     sudo mv MiniBrowser.AppImage /opt/mini-browser/mini-browser
 
-    # Download icon
+    # Download icon to a standard location
     ICON_URL="https://raw.githubusercontent.com/$REPO/master/resources/icon.png"
     echo "Downloading application icon..."
     sudo curl -L "$ICON_URL" -o /opt/mini-browser/icon.png
     
-    # Create Desktop Entry
+    # Create Desktop Entry with absolute icon path
     cat <<EOF > mini-browser.desktop
 [Desktop Entry]
 Name=Mini Browser
+Comment=A minimal browser for focused work
 Exec=/opt/mini-browser/mini-browser --no-sandbox
 Icon=/opt/mini-browser/icon.png
+Terminal=false
 Type=Application
-Categories=Utility;
+Categories=Utility;Network;WebBrowser;
 EOF
     mkdir -p ~/.local/share/applications
     mv mini-browser.desktop ~/.local/share/applications/
     
+    # Force icon cache update if possible
+    [ -x "$(command -v update-desktop-database)" ] && update-desktop-database ~/.local/share/applications || true
+    
     echo "AppImage installed to /opt/mini-browser/ and shortcut created."
+elif [ "$INSTALL_TYPE" == "deb" ]; then
+    echo "Downloading and installing .deb package..."
+    curl -L "$DEB_URL" -o mini-browser.deb
+    sudo apt-get update && sudo apt-get install -y ./mini-browser.deb
 fi
 
 rm -rf "$TEMP_DIR"

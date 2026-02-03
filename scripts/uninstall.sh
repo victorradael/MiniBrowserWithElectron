@@ -11,9 +11,9 @@ if dpkg -l | grep -q mini-browser; then
     sudo apt-get remove -y mini-browser
 fi
 
-# Check for AppImage installation
+# Check for AppImage installation and icons
 if [ -d "/opt/mini-browser" ]; then
-    echo "Removing AppImage files..."
+    echo "Removing Mini Browser files and icons from /opt..."
     sudo rm -rf /opt/mini-browser
 fi
 
