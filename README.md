@@ -33,6 +33,22 @@ O Mini Browser abandona o visual de navegador padrão para uma experiência de a
 Recomendamos baixar a versão oficial compilada para evitar necessidade de compilação:
 👉 **[Baixar última versão (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
 
+### Linux
+
+#### Quick Install (Debian/Ubuntu/AppImage)
+You can install the latest version of Mini Browser with a single command:
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/main/scripts/install.sh | bash
+```
+
+To uninstall:
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/main/scripts/uninstall.sh | bash
+```
+
+#### Manual Installation
+- Download the `.deb` or `.AppImage` from the [latest release](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest).
+
 ### Para Desenvolvedores
 1.  **Clone e Instale**:
     ```bash
