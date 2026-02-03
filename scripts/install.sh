@@ -88,13 +88,18 @@ elif [ "$INSTALL_TYPE" == "appimage" ]; then
     
     sudo mkdir -p /opt/mini-browser
     sudo mv MiniBrowser.AppImage /opt/mini-browser/mini-browser
+
+    # Download icon
+    ICON_URL="https://raw.githubusercontent.com/$REPO/master/resources/icon.png"
+    echo "Downloading application icon..."
+    sudo curl -L "$ICON_URL" -o /opt/mini-browser/icon.png
     
     # Create Desktop Entry
     cat <<EOF > mini-browser.desktop
 [Desktop Entry]
 Name=Mini Browser
 Exec=/opt/mini-browser/mini-browser --no-sandbox
-Icon=mini-browser
+Icon=/opt/mini-browser/icon.png
 Type=Application
 Categories=Utility;
 EOF
