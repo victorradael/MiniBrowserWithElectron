@@ -10,18 +10,37 @@ APP_NAME="mini-browser"
 GITHUB_API="https://api.github.com/repos/$REPO/releases/latest"
 
 # Check dependencies
-for cmd in curl jq wget; do
-    if ! command -v $cmd &> /dev/null; then
-        echo "Error: $cmd is not installed. Please install it and try again."
+if ! command -v curl &> /dev/null; then
+    echo "Error: curl is not installed. Please install it and try again."
+    exit 1
+fi
+
+# Function to parse JSON without jq (using python3)
+parse_json() {
+    local key=$1
+    if command -v jq &> /dev/null; then
+        echo "$RELEASE_DATA" | jq -r "$key"
+    elif command -v python3 &> /dev/null; then
+        echo "$RELEASE_DATA" | python3 -c "import sys, json; print(eval('json.load(sys.stdin)' + '$key'.replace('.', '[\"').replace('[]', '').replace('AssetKey', ''))) " 2>/dev/null
+        # Simplified Python parser for specific fields needed
+        if [[ "$key" == ".tag_name" ]]; then
+            echo "$RELEASE_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name'])"
+        elif [[ "$key" == ".assets[] | select(.name | endswith(\".deb\")) | .browser_download_url" ]]; then
+            echo "$RELEASE_DATA" | python3 -c "import sys, json; print(next((a['browser_download_url'] for a in json.load(sys.stdin)['assets'] if a['name'].endswith('.deb')), ''))"
+        elif [[ "$key" == ".assets[] | select(.name | endswith(\".AppImage\")) | .browser_download_url" ]]; then
+            echo "$RELEASE_DATA" | python3 -c "import sys, json; print(next((a['browser_download_url'] for a in json.load(sys.stdin)['assets'] if a['name'].endswith('.AppImage')), ''))"
+        fi
+    else
+        echo "Error: Neither 'jq' nor 'python3' is installed. One of them is required to parse GitHub API data." >&2
         exit 1
     fi
-done
+}
 
 echo "Fetching latest release information..."
 RELEASE_DATA=$(curl -s $GITHUB_API)
-VERSION=$(echo "$RELEASE_DATA" | jq -r .tag_name)
+VERSION=$(parse_json ".tag_name")
 
-if [ "$VERSION" == "null" ]; then
+if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
     echo "Error: Could not find any releases for $REPO."
     exit 1
 fi
@@ -29,8 +48,8 @@ fi
 echo "Latest version found: $VERSION"
 
 # Get download URLs
-DEB_URL=$(echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url')
-APPIMAGE_URL=$(echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | endswith(".AppImage")) | .browser_download_url')
+DEB_URL=$(parse_json ".assets[] | select(.name | endswith(\".deb\")) | .browser_download_url")
+APPIMAGE_URL=$(parse_json ".assets[] | select(.name | endswith(\".AppImage\")) | .browser_download_url")
 
 if [ -n "$DEB_URL" ]; then
     echo "Found .deb package."
@@ -48,11 +67,11 @@ cd "$TEMP_DIR"
 
 if [ "$INSTALL_TYPE" == "deb" ]; then
     echo "Downloading and installing .deb package..."
-    wget -q --show-progress "$DEB_URL" -O mini-browser.deb
+    curl -L "$DEB_URL" -o mini-browser.deb
     sudo apt-get update && sudo apt-get install -y ./mini-browser.deb
 elif [ "$INSTALL_TYPE" == "appimage" ]; then
     echo "Downloading and setting up .AppImage..."
-    wget -q --show-progress "$APPIMAGE_URL" -O MiniBrowser.AppImage
+    curl -L "$APPIMAGE_URL" -o MiniBrowser.AppImage
     chmod +x MiniBrowser.AppImage
     
     sudo mkdir -p /opt/mini-browser
