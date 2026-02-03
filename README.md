@@ -38,12 +38,12 @@ Recomendamos baixar a versão oficial compilada para evitar necessidade de compi
 #### Quick Install (Debian/Ubuntu/AppImage)
 You can install the latest version of Mini Browser with a single command:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
 ```
 
 To uninstall:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/main/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/uninstall.sh | bash
 ```
 
 #### Manual Installation

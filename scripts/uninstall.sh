@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Mini Browser Deinstallation Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/main/scripts/uninstall.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/uninstall.sh | bash
 
 echo "Starting uninstallation of Mini Browser..."
 

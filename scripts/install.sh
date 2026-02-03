@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Mini Browser Installation Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/main/scripts/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
 
 set -e
 
