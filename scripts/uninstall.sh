@@ -11,16 +11,16 @@ if dpkg -l | grep -q mini-browser; then
     sudo apt-get remove -y mini-browser
 fi
 
-# Check for AppImage installation and icons
-if [ -d "/opt/mini-browser" ]; then
-    echo "Removing Mini Browser files and icons from /opt..."
-    sudo rm -rf /opt/mini-browser
-fi
+# Check for various installation paths and icons
+echo "Cleaning up files and icons..."
+[ -d "/opt/mini-browser" ] && sudo rm -rf "/opt/mini-browser"
+[ -d "/opt/Mini Browser" ] && sudo rm -rf "/opt/Mini Browser"
+sudo rm -f /usr/bin/mini-browser
 
-# Check for Desktop Entry
-if [ -f "$HOME/.local/share/applications/mini-browser.desktop" ]; then
-    echo "Removing desktop entry..."
-    rm "$HOME/.local/share/applications/mini-browser.desktop"
-fi
+# Check for Desktop Entries (both custom and system)
+echo "Removing desktop entries..."
+rm -f "$HOME/.local/share/applications/mini-browser.desktop"
+# We don't remove system-wide ones as they should be handled by apt remove,
+# but we ensures our override is gone.
 
 echo "Mini Browser has been uninstalled."

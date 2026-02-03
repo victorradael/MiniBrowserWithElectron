@@ -17,27 +17,24 @@ fi
 
 # Function to parse JSON without jq (using python3)
 parse_json() {
-    local key=$1
+    local type=$1
     if command -v jq &> /dev/null; then
-        echo "$RELEASE_DATA" | jq -r "$key"
+        case $type in
+            tag) echo "$RELEASE_DATA" | jq -r ".tag_name" ;;
+            deb) echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | test("\\.deb$"; "i")) | .browser_download_url' | head -n 1 ;;
+            appimage) echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | test("\\.appimage$"; "i")) | .browser_download_url' | head -n 1 ;;
+        esac
     elif command -v python3 &> /dev/null; then
-        echo "$RELEASE_DATA" | python3 -c "import sys, json; print(eval('json.load(sys.stdin)' + '$key'.replace('.', '[\"').replace('[]', '').replace('AssetKey', ''))) " 2>/dev/null
-        # Simplified Python parser for specific fields needed
-        if [[ "$key" == ".tag_name" ]]; then
-            echo "$RELEASE_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name'])"
-        elif [[ "$key" == ".assets[] | select(.name | endswith(\".deb\")) | .browser_download_url" ]]; then
-            echo "$RELEASE_DATA" | python3 -c "import sys, json; print(next((a['browser_download_url'] for a in json.load(sys.stdin)['assets'] if a['name'].endswith('.deb')), ''))"
-        elif [[ "$key" == ".assets[] | select(.name | endswith(\".AppImage\")) | .browser_download_url" ]]; then
-            echo "$RELEASE_DATA" | python3 -c "import sys, json; print(next((a['browser_download_url'] for a in json.load(sys.stdin)['assets'] if a['name'].endswith('.AppImage')), ''))"
-        fi
-    else
-        echo "Error: Neither 'jq' nor 'python3' is installed. One of them is required to parse GitHub API data." >&2
-        exit 1
+        case $type in
+            tag) echo "$RELEASE_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('tag_name', ''))" ;;
+            deb) echo "$RELEASE_DATA" | python3 -c "import sys, json; print(next((a['browser_download_url'] for a in json.load(sys.stdin).get('assets', []) if a['name'].lower().endswith('.deb')), ''))" 2>/dev/null ;;
+            appimage) echo "$RELEASE_DATA" | python3 -c "import sys, json; print(next((a['browser_download_url'] for a in json.load(sys.stdin).get('assets', []) if a['name'].lower().endswith('.appimage')), ''))" 2>/dev/null ;;
+        esac
     fi
 }
 
 echo "Fetching latest release information..."
-RELEASE_RESPONSE=$(curl -s -w "%{http_code}" $GITHUB_API)
+RELEASE_RESPONSE=$(curl -s -L -w "%{http_code}" "$GITHUB_API")
 HTTP_CODE="${RELEASE_RESPONSE:${#RELEASE_RESPONSE}-3}"
 RELEASE_DATA="${RELEASE_RESPONSE:0:${#RELEASE_RESPONSE}-3}"
 
@@ -50,7 +47,7 @@ elif [ "$HTTP_CODE" -ne 200 ]; then
     exit 1
 fi
 
-VERSION=$(parse_json ".tag_name")
+VERSION=$(parse_json "tag")
 
 if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
     echo "Error: Could not extract version from GitHub API response."
@@ -60,59 +57,65 @@ fi
 echo "Latest version found: $VERSION"
 
 # Get download URLs
-DEB_URL=$(parse_json ".assets[] | select(.name | endswith(\".deb\")) | .browser_download_url")
-APPIMAGE_URL=$(parse_json ".assets[] | select(.name | endswith(\".AppImage\")) | .browser_download_url")
+APPIMAGE_URL=$(parse_json "appimage")
+DEB_URL=$(parse_json "deb")
 
 if [ -n "$APPIMAGE_URL" ]; then
-    echo "Found .AppImage package (preferred for better icon support)."
+    echo "Found AppImage package."
     INSTALL_TYPE="appimage"
+    DOWNLOAD_URL="$APPIMAGE_URL"
 elif [ -n "$DEB_URL" ]; then
     echo "Found .deb package."
     INSTALL_TYPE="deb"
+    DOWNLOAD_URL="$DEB_URL"
 else
-    echo "Error: No suitable Linux binaries (.deb or .AppImage) found in the latest release."
+    echo "Error: No suitable Linux binaries found in the latest release."
     exit 1
 fi
 
 TEMP_DIR=$(mktemp -d)
+chmod 755 "$TEMP_DIR"
 cd "$TEMP_DIR"
 
 if [ "$INSTALL_TYPE" == "appimage" ]; then
-    echo "Downloading and setting up .AppImage..."
-    curl -L "$APPIMAGE_URL" -o MiniBrowser.AppImage
-    chmod +x MiniBrowser.AppImage
-    
+    echo "Downloading and setting up AppImage..."
+    curl -L "$DOWNLOAD_URL" -o mini-browser.AppImage
+    chmod +x mini-browser.AppImage
     sudo mkdir -p /opt/mini-browser
-    sudo mv MiniBrowser.AppImage /opt/mini-browser/mini-browser
+    sudo mv mini-browser.AppImage /opt/mini-browser/mini-browser
+else
+    echo "Downloading and installing .deb package..."
+    curl -L "$DOWNLOAD_URL" -o mini-browser.deb
+    sudo apt-get update && sudo apt-get install -y ./mini-browser.deb
+fi
 
-    # Download icon to a standard location
-    ICON_URL="https://raw.githubusercontent.com/$REPO/master/resources/icon.png"
-    echo "Downloading application icon..."
-    sudo curl -L "$ICON_URL" -o /opt/mini-browser/icon.png
-    
-    # Create Desktop Entry with absolute icon path
-    cat <<EOF > mini-browser.desktop
+# ICON AND DESKTOP ENTRY (Unified for both types to ensure correct icon)
+echo "Setting up application icon and menu shortcut..."
+sudo mkdir -p /opt/mini-browser
+ICON_URL="https://raw.githubusercontent.com/$REPO/master/resources/icon.png"
+sudo curl -s -L "$ICON_URL" -o /opt/mini-browser/icon.png
+
+cat <<EOF > mini-browser-custom.desktop
 [Desktop Entry]
 Name=Mini Browser
 Comment=A minimal browser for focused work
-Exec=/opt/mini-browser/mini-browser --no-sandbox
+Exec=mini-browser --no-sandbox
 Icon=/opt/mini-browser/icon.png
 Terminal=false
 Type=Application
 Categories=Utility;Network;WebBrowser;
 EOF
-    mkdir -p ~/.local/share/applications
-    mv mini-browser.desktop ~/.local/share/applications/
-    
-    # Force icon cache update if possible
-    [ -x "$(command -v update-desktop-database)" ] && update-desktop-database ~/.local/share/applications || true
-    
-    echo "AppImage installed to /opt/mini-browser/ and shortcut created."
-elif [ "$INSTALL_TYPE" == "deb" ]; then
-    echo "Downloading and installing .deb package..."
-    curl -L "$DEB_URL" -o mini-browser.deb
-    sudo apt-get update && sudo apt-get install -y ./mini-browser.deb
+
+# Use a standard bin link for appimage
+if [ "$INSTALL_TYPE" == "appimage" ]; then
+    sudo ln -sf /opt/mini-browser/mini-browser /usr/local/bin/mini-browser
 fi
+
+mkdir -p ~/.local/share/applications
+mv mini-browser-custom.desktop ~/.local/share/applications/mini-browser.desktop
+
+# Force database update
+[ -x "$(command -v update-desktop-database)" ] && update-desktop-database ~/.local/share/applications || true
 
 rm -rf "$TEMP_DIR"
 echo "Mini Browser $VERSION installed successfully!"
