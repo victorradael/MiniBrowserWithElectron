@@ -21,6 +21,7 @@ function createWindow() {
         autoHideMenuBar: true,
         frame: false, // Make the window frameless
         alwaysOnTop: true, // Default to true based on user requirement
+        type: process.platform === 'linux' ? 'toolbar' : 'normal',
         icon,
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
@@ -29,6 +30,8 @@ function createWindow() {
             webviewTag: true // Enable webview tag for the browser functionality
         }
     })
+
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
     mainWindow.on('ready-to-show', () => {
         console.log('Window ready-to-show event fired')
@@ -39,6 +42,17 @@ function createWindow() {
             mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
         } else {
             mainWindow.setAlwaysOnTop(true)
+        }
+    })
+
+    // Re-assert alwaysOnTop on blur for robust behavior on Linux
+    mainWindow.on('blur', () => {
+        if (mainWindow.isAlwaysOnTop()) {
+            if (process.platform === 'linux') {
+                mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
+            } else {
+                mainWindow.setAlwaysOnTop(true)
+            }
         }
     })
 
