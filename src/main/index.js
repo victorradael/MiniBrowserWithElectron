@@ -12,6 +12,13 @@ const store = new Store()
 app.commandLine.appendSwitch('log-level', '3')
 app.commandLine.appendSwitch('disable-gpu-process-crash-log')
 
+// FORCE X11 (XWayland) to fix "Always on Top" on Ubuntu 24.04/Wayland
+// Native Wayland in Electron 40 doesn't support the required windowing hints yet.
+app.commandLine.appendSwitch('ozone-platform', 'x11')
+
+// Disable hardware acceleration to avoid windowing/compositing bugs in some environments
+app.disableHardwareAcceleration()
+
 function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
@@ -21,7 +28,6 @@ function createWindow() {
         autoHideMenuBar: true,
         frame: false, // Make the window frameless
         alwaysOnTop: true, // Default to true based on user requirement
-        type: process.platform === 'linux' ? 'toolbar' : 'normal',
         icon,
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
@@ -31,28 +37,38 @@ function createWindow() {
         }
     })
 
-    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    // Better Wayland compatibility for visible on all workspaces
+    mainWindow.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+    })
 
     mainWindow.on('ready-to-show', () => {
         console.log('Window ready-to-show event fired')
         mainWindow.show()
 
-        // Ensure alwaysOnTop is active after show, using a higher level for Linux
-        if (process.platform === 'linux') {
-            mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
-        } else {
-            mainWindow.setAlwaysOnTop(true)
-        }
-    })
-
-    // Re-assert alwaysOnTop on blur for robust behavior on Linux
-    mainWindow.on('blur', () => {
-        if (mainWindow.isAlwaysOnTop()) {
+        // Wayland sometimes needs a small delay after show to respect alwaysOnTop
+        setTimeout(() => {
             if (process.platform === 'linux') {
                 mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
             } else {
                 mainWindow.setAlwaysOnTop(true)
             }
+        }, 200)
+    })
+
+    // Re-assert alwaysOnTop on blur for robust behavior on Linux (Wayland friendly)
+    let blurTimeout
+    mainWindow.on('blur', () => {
+        if (mainWindow.isAlwaysOnTop()) {
+            clearTimeout(blurTimeout)
+            blurTimeout = setTimeout(() => {
+                if (process.platform === 'linux') {
+                    mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
+                } else {
+                    mainWindow.setAlwaysOnTop(true)
+                }
+            }, 100)
         }
     })
 
