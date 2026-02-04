@@ -33,6 +33,13 @@ function createWindow() {
     mainWindow.on('ready-to-show', () => {
         console.log('Window ready-to-show event fired')
         mainWindow.show()
+
+        // Ensure alwaysOnTop is active after show, using a higher level for Linux
+        if (process.platform === 'linux') {
+            mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
+        } else {
+            mainWindow.setAlwaysOnTop(true)
+        }
     })
 
     mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -52,8 +59,15 @@ function createWindow() {
     // Always on top toggle IPC
     ipcMain.handle('toggle-always-on-top', () => {
         const isAlwaysOnTop = mainWindow.isAlwaysOnTop()
-        mainWindow.setAlwaysOnTop(!isAlwaysOnTop)
-        return !isAlwaysOnTop
+        const newState = !isAlwaysOnTop
+
+        if (process.platform === 'linux') {
+            mainWindow.setAlwaysOnTop(newState, 'screen-saver', 1)
+        } else {
+            mainWindow.setAlwaysOnTop(newState)
+        }
+
+        return newState
     })
 
     ipcMain.handle('get-always-on-top', () => {
