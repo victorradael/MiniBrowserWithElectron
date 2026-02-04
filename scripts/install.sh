@@ -103,6 +103,7 @@ Exec=mini-browser --no-sandbox
 Icon=/opt/mini-browser/icon.png
 Terminal=false
 Type=Application
+StartupWMClass=Mini Browser
 Categories=Utility;Network;WebBrowser;
 EOF
 

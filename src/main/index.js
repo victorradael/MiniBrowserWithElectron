@@ -12,15 +12,20 @@ const store = new Store()
 app.commandLine.appendSwitch('log-level', '3')
 app.commandLine.appendSwitch('disable-gpu-process-crash-log')
 
-// FORCE X11 (XWayland) to fix "Always on Top" on Ubuntu 24.04/Wayland
-// Native Wayland in Electron 40 doesn't support the required windowing hints yet.
-app.commandLine.appendSwitch('ozone-platform', 'x11')
+// Allow Electron to decide the best platform (Wayland vs X11) automatically
+// app.commandLine.appendSwitch('ozone-platform-hint', 'auto')
 
-// Disable hardware acceleration to avoid windowing/compositing bugs in some environments
-app.disableHardwareAcceleration()
+// Set the application name clearly for the window manager (helpful for GNOME)
+app.setName('Mini Browser')
+
+// Linux: Explicitly link to the desktop file for icon association in dev mode
+if (is.dev && process.platform === 'linux') {
+    app.setDesktopName('mini-browser-dev.desktop')
+}
 
 function createWindow() {
     // Create the browser window.
+    const iconPath = join(__dirname, '../../resources/icon.png')
     const mainWindow = new BrowserWindow({
         width: 900,
         height: 670,
@@ -28,7 +33,7 @@ function createWindow() {
         autoHideMenuBar: true,
         frame: false, // Make the window frameless
         alwaysOnTop: true, // Default to true based on user requirement
-        icon,
+        icon: electron.nativeImage.createFromPath(iconPath),
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false,
@@ -49,28 +54,11 @@ function createWindow() {
 
         // Wayland sometimes needs a small delay after show to respect alwaysOnTop
         setTimeout(() => {
-            if (process.platform === 'linux') {
-                mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
-            } else {
-                mainWindow.setAlwaysOnTop(true)
-            }
+            mainWindow.setAlwaysOnTop(true)
         }, 200)
     })
 
-    // Re-assert alwaysOnTop on blur for robust behavior on Linux (Wayland friendly)
-    let blurTimeout
-    mainWindow.on('blur', () => {
-        if (mainWindow.isAlwaysOnTop()) {
-            clearTimeout(blurTimeout)
-            blurTimeout = setTimeout(() => {
-                if (process.platform === 'linux') {
-                    mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
-                } else {
-                    mainWindow.setAlwaysOnTop(true)
-                }
-            }, 100)
-        }
-    })
+
 
     mainWindow.webContents.setWindowOpenHandler((details) => {
         shell.openExternal(details.url)
@@ -91,11 +79,7 @@ function createWindow() {
         const isAlwaysOnTop = mainWindow.isAlwaysOnTop()
         const newState = !isAlwaysOnTop
 
-        if (process.platform === 'linux') {
-            mainWindow.setAlwaysOnTop(newState, 'screen-saver', 1)
-        } else {
-            mainWindow.setAlwaysOnTop(newState)
-        }
+        mainWindow.setAlwaysOnTop(newState)
 
         return newState
     })
@@ -139,7 +123,7 @@ app.on('web-contents-created', (_, contents) => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
     // Set app user model id for windows
-    electronApp.setAppUserModelId('com.electron')
+    electronApp.setAppUserModelId('com.victorradael.minibrowser')
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
