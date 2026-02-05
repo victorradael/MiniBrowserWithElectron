@@ -51,6 +51,7 @@ function App() {
     const [appVersion, setAppVersion] = useState('')
 
     const [newAlias, setNewAlias] = useState('')
+    const [dashboardContainer, setDashboardContainer] = useState(null)
     const dashboardRef = useRef(null)
 
     useEffect(() => {
@@ -215,94 +216,101 @@ function App() {
     )
 
     const renderDashboard = () => (
-        <div ref={dashboardRef} className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto min-w-0 relative transition-colors duration-500">
+        <div className="flex-1 relative overflow-hidden bg-gray-900 transition-colors duration-500">
             <InteractiveBackground />
-            <ScrollIndicator containerRef={dashboardRef} />
-            <div className="max-w-2xl mx-auto">
-                <header className="mb-8 flex items-center justify-between draggable">
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <Monitor className="text-blue-500" />
-                        Mini Browser
-                    </h1>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 flex items-center gap-2 transition-colors border border-gray-700 no-drag"
-                        >
-                            <Shield size={16} className="text-blue-500" />
-                            <span className="text-sm">Bitwarden</span>
-                        </button>
-                    </div>
-                </header>
-
-                <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 mb-8">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-200">Add New Page</h2>
-                    <div className="flex flex-col gap-3">
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={newUrl}
-                                onChange={(e) => setNewUrl(e.target.value)}
-                                placeholder="Enter URL (e.g. google.com)"
-                                className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
-                            />
-                            <input
-                                type="text"
-                                value={newAlias}
-                                onChange={(e) => setNewAlias(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && addUrl()}
-                                placeholder="Alias (e.g. My Search)"
-                                className="w-1/3 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
-                            />
-                        </div>
-                        <button
-                            onClick={addUrl}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors w-full"
-                        >
-                            Add to Dashboard
-                        </button>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4">
-                    {urls.map(item => (
-                        <div key={item.id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center justify-between group hover:border-blue-500/50 transition-colors w-full min-w-0">
-                            <div
-                                className="flex-1 cursor-pointer flex items-center gap-4 min-w-0 mr-4"
-                                onClick={() => setCurrentUrl(item.url)}
-                            >
-                                <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center shrink-0 border border-gray-700 overflow-hidden">
-                                    <PageIcon url={item.url} />
-                                </div>
-                                <div className="min-w-0 truncate">
-                                    <h3 className="font-semibold text-gray-100 truncate">
-                                        {item.alias || cleanUrl(item.url)}
-                                    </h3>
-                                    <p className="text-xs text-gray-500 truncate">
-                                        {item.alias ? cleanUrl(item.url) : 'Click to open'}
-                                    </p>
-                                </div>
-                            </div>
+            <ScrollIndicator containerRef={dashboardContainer} watch={[urls]} />
+            <div
+                ref={(el) => {
+                    dashboardRef.current = el;
+                    if (el !== dashboardContainer) setDashboardContainer(el);
+                }}
+                className="h-full w-full p-8 overflow-y-auto min-w-0 font-sans text-gray-100 relative z-10"
+            >
+                <div className="max-w-2xl mx-auto">
+                    <header className="mb-8 flex items-center justify-between draggable">
+                        <h1 className="text-2xl font-bold flex items-center gap-2">
+                            <Monitor className="text-blue-500" />
+                            Mini Browser
+                        </h1>
+                        <div className="flex items-center gap-2">
                             <button
-                                onClick={() => removeUrl(item.id)}
-                                className="p-2 text-gray-500 hover:text-red-400 hover:bg-gray-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                title="Remove"
+                                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 flex items-center gap-2 transition-colors border border-gray-700 no-drag"
                             >
-                                <Trash2 size={18} />
+                                <Shield size={16} className="text-blue-500" />
+                                <span className="text-sm">Bitwarden</span>
                             </button>
                         </div>
-                    ))}
+                    </header>
 
-                    {urls.length === 0 && (
-                        <div className="text-center py-12 text-gray-500">
-                            No pages added yet. Add one above!
+                    <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 mb-8">
+                        <h2 className="text-lg font-semibold mb-4 text-gray-200">Add New Page</h2>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newUrl}
+                                    onChange={(e) => setNewUrl(e.target.value)}
+                                    placeholder="Enter URL (e.g. google.com)"
+                                    className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
+                                />
+                                <input
+                                    type="text"
+                                    value={newAlias}
+                                    onChange={(e) => setNewAlias(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && addUrl()}
+                                    placeholder="Alias (e.g. My Search)"
+                                    className="w-1/3 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
+                                />
+                            </div>
+                            <button
+                                onClick={addUrl}
+                                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors w-full"
+                            >
+                                Add to Dashboard
+                            </button>
                         </div>
-                    )}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                        {urls.map(item => (
+                            <div key={item.id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center justify-between group hover:border-blue-500/50 transition-colors w-full min-w-0">
+                                <div
+                                    className="flex-1 cursor-pointer flex items-center gap-4 min-w-0 mr-4"
+                                    onClick={() => setCurrentUrl(item.url)}
+                                >
+                                    <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center shrink-0 border border-gray-700 overflow-hidden">
+                                        <PageIcon url={item.url} />
+                                    </div>
+                                    <div className="min-w-0 truncate">
+                                        <h3 className="font-semibold text-gray-100 truncate">
+                                            {item.alias || cleanUrl(item.url)}
+                                        </h3>
+                                        <p className="text-xs text-gray-500 truncate">
+                                            {item.alias ? cleanUrl(item.url) : 'Click to open'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => removeUrl(item.id)}
+                                    className="p-2 text-gray-500 hover:text-red-400 hover:bg-gray-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                    title="Remove"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))}
+
+                        {urls.length === 0 && (
+                            <div className="text-center py-12 text-gray-500">
+                                No pages added yet. Add one above!
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     )
-
 
     const [sidebarWidth, setSidebarWidth] = useState(350)
     const [isResizing, setIsResizing] = useState(false)

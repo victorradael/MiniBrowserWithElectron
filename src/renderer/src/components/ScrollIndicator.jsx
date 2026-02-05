@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, ChevronRight, ChevronLeft } from 'lucide-react'
 
-export default function ScrollIndicator({ containerRef, direction = 'vertical' }) {
+export default function ScrollIndicator({ containerRef, direction = 'vertical', watch = [] }) {
     const [showStart, setShowStart] = useState(false)
     const [showEnd, setShowEnd] = useState(false)
 
     useEffect(() => {
-        const container = containerRef.current
+        // Handle both ref object and direct element
+        const container = containerRef?.current || containerRef
         if (!container) return
 
         const checkScroll = () => {
@@ -27,17 +28,29 @@ export default function ScrollIndicator({ containerRef, direction = 'vertical' }
         // Check on scroll
         container.addEventListener('scroll', checkScroll)
 
-        // Check on resize (of window or content)
+        // Check on resize (of container)
         const resizeObserver = new ResizeObserver(checkScroll)
         resizeObserver.observe(container)
 
-        // Also watch for child changes if possible, or just rely on ResizeObserver
+        // Observe all direct children to catch content size changes (scrollHeight)
+        const children = Array.from(container.children)
+        children.forEach(child => resizeObserver.observe(child))
+
+        // MutationObserver to watch for new children
+        const mutationObserver = new MutationObserver(() => {
+            checkScroll()
+            // Re-observe children in case they changed
+            const newChildren = Array.from(container.children)
+            newChildren.forEach(child => resizeObserver.observe(child))
+        })
+        mutationObserver.observe(container, { childList: true, subtree: true })
 
         return () => {
             container.removeEventListener('scroll', checkScroll)
             resizeObserver.disconnect()
+            mutationObserver.disconnect()
         }
-    }, [containerRef, direction])
+    }, [containerRef, direction, ...watch]) // Re-run if container or watch items change
 
     if (direction === 'vertical') {
         return (
