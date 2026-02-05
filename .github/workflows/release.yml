@@ -2,20 +2,21 @@ name: Build/Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
+
+permissions:
+  contents: write
 
 jobs:
   release:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out git repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -25,6 +26,11 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
 
       - name: Build/Release Electron app
         uses: samuelmeuli/action-electron-builder@v1
