@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
+import ScrollIndicator from './components/ScrollIndicator'
 
 const getFavicon = (url) => {
     try {
@@ -49,6 +50,7 @@ function App() {
     const [appVersion, setAppVersion] = useState('')
 
     const [newAlias, setNewAlias] = useState('')
+    const dashboardRef = useRef(null)
 
     useEffect(() => {
         // Load saved URLs from electron-store
@@ -213,7 +215,8 @@ function App() {
 
     // Dashboard View Layout (When no URL is selected)
     const renderDashboard = () => (
-        <div className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto min-w-0">
+        <div ref={dashboardRef} className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto min-w-0 relative">
+            <ScrollIndicator containerRef={dashboardRef} />
             <div className="max-w-2xl mx-auto">
                 <header className="mb-8 flex items-center justify-between draggable">
                     <h1 className="text-2xl font-bold flex items-center gap-2">
