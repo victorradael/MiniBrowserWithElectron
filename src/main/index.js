@@ -98,6 +98,11 @@ function createWindow() {
         return true
     })
 
+    // App Version IPC
+    ipcMain.handle('get-app-version', () => {
+        return app.getVersion()
+    })
+
     // App Quit IPC
     ipcMain.handle('quit-app', () => {
         app.quit()

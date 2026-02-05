@@ -46,6 +46,7 @@ function App() {
     const [newUrl, setNewUrl] = useState('')
     const [isAlwaysOnTop, setIsAlwaysOnTop] = useState(false)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [appVersion, setAppVersion] = useState('')
 
     const [newAlias, setNewAlias] = useState('')
 
@@ -60,6 +61,9 @@ function App() {
 
         // Check initial Always On Top state
         window.api?.getAlwaysOnTop().then(setIsAlwaysOnTop)
+
+        // Get App Version
+        window.api?.getAppVersion().then(setAppVersion)
     }, [])
 
     useEffect(() => {
@@ -209,7 +213,7 @@ function App() {
 
     // Dashboard View Layout (When no URL is selected)
     const renderDashboard = () => (
-        <div className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto">
+        <div className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto min-w-0">
             <div className="max-w-2xl mx-auto">
                 <header className="mb-8 flex items-center justify-between draggable">
                     <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -256,17 +260,17 @@ function App() {
                     </div>
                 </div>
 
-                <div className="grid gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     {urls.map(item => (
-                        <div key={item.id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center justify-between group hover:border-blue-500/50 transition-colors">
+                        <div key={item.id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center justify-between group hover:border-blue-500/50 transition-colors w-full min-w-0">
                             <div
-                                className="flex-1 cursor-pointer flex items-center gap-4 truncate mr-4"
+                                className="flex-1 cursor-pointer flex items-center gap-4 min-w-0 mr-4"
                                 onClick={() => setCurrentUrl(item.url)}
                             >
                                 <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center shrink-0 border border-gray-700 overflow-hidden">
                                     <PageIcon url={item.url} />
                                 </div>
-                                <div className="truncate">
+                                <div className="min-w-0 truncate">
                                     <h3 className="font-semibold text-gray-100 truncate">
                                         {item.alias || cleanUrl(item.url)}
                                     </h3>
@@ -378,6 +382,11 @@ function App() {
             {/* Watermark Helper - Moved to Bottom Left */}
             <div className="fixed bottom-4 left-4 text-[10px] text-gray-600 pointer-events-none select-none uppercase tracking-widest bg-gray-900/50 px-2 py-1 rounded border border-gray-800/50 z-[100]">
                 Ctrl + Q para fechar
+            </div>
+
+            {/* Version Watermark - Bottom Right */}
+            <div className="fixed bottom-4 right-4 text-[10px] text-gray-400 pointer-events-none select-none uppercase tracking-widest bg-gray-900/50 px-2 py-1 rounded border border-gray-800/50 z-[100] opacity-50">
+                v{appVersion}
             </div>
         </div>
     )

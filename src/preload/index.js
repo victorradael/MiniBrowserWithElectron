@@ -8,7 +8,8 @@ const api = {
     openExtensionsFolder: () => ipcRenderer.invoke('open-extensions-folder'),
     installBitwarden: () => ipcRenderer.invoke('install-bitwarden'),
     getUrls: () => ipcRenderer.invoke('get-urls'),
-    saveUrls: (urls) => ipcRenderer.invoke('save-urls', urls)
+    saveUrls: (urls) => ipcRenderer.invoke('save-urls', urls),
+    getAppVersion: () => ipcRenderer.invoke('get-app-version')
 }
 
 if (process.contextIsolated) {
