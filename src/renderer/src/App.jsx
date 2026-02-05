@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
 import ScrollIndicator from './components/ScrollIndicator'
+import InteractiveBackground from './components/InteractiveBackground'
 
 const getFavicon = (url) => {
     try {
@@ -213,9 +214,9 @@ function App() {
         </div>
     )
 
-    // Dashboard View Layout (When no URL is selected)
     const renderDashboard = () => (
-        <div ref={dashboardRef} className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto min-w-0 relative">
+        <div ref={dashboardRef} className="flex-1 min-h-screen bg-gray-900 text-gray-100 font-sans p-8 overflow-y-auto min-w-0 relative transition-colors duration-500">
+            <InteractiveBackground />
             <ScrollIndicator containerRef={dashboardRef} />
             <div className="max-w-2xl mx-auto">
                 <header className="mb-8 flex items-center justify-between draggable">
