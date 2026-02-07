@@ -15,6 +15,23 @@ if ! command -v curl &> /dev/null; then
     exit 1
 fi
 
+# IMPROVEMENT: Check if already installed and uninstall if necessary
+echo "Checking for existing installation..."
+ALREADY_INSTALLED=false
+if dpkg -l | grep -q mini-browser; then
+    ALREADY_INSTALLED=true
+elif [ -d "/opt/mini-browser" ]; then
+    ALREADY_INSTALLED=true
+fi
+
+if [ "$ALREADY_INSTALLED" = true ]; then
+    echo "Existing installation detected. Running uninstaller before proceeding..."
+    # Download and run the uninstaller directly from the repo to ensure it's up to date
+    curl -fsSL "https://raw.githubusercontent.com/$REPO/master/scripts/uninstall.sh" | bash || {
+        echo "Warning: Uninstallation script encountered an error. Attempting to continue installation anyway..."
+    }
+fi
+
 # Function to parse JSON without jq (using python3)
 parse_json() {
     local type=$1
