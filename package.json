@@ -1,7 +1,7 @@
 {
   "name": "mini-browser",
   "productName": "Mini Browser",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "A minimal browser for focused work",
   "main": "out/main/index.js",
   "scripts": {
