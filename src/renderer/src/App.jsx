@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
 import ScrollIndicator from './components/ScrollIndicator'
 import InteractiveBackground from './components/InteractiveBackground'
+import UpdateNotifier from './components/UpdateNotifier'
 
 const getFavicon = (url) => {
     try {
@@ -400,6 +401,8 @@ function App() {
             <div className="fixed bottom-4 right-4 text-[10px] text-gray-400 pointer-events-none select-none uppercase tracking-widest bg-gray-900/50 px-2 py-1 rounded border border-gray-800/50 z-[100] opacity-50">
                 v{appVersion}
             </div>
+
+            <UpdateNotifier currentVersion={appVersion} />
         </div>
     )
 }
