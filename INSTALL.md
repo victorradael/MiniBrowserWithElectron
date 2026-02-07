@@ -21,7 +21,8 @@ Se você gerou um arquivo `.deb`, pode instalá-lo via terminal:
 
 ### Instalar:
 ```bash
-sudo dpkg -i dist/mini-browser_2.0.0_amd64.deb
+# Navegue até a pasta dist e instale o pacote gerado
+sudo dpkg -i dist/mini-browser_*.deb
 # Caso falte dependências:
 sudo apt-get install -f
 ```
@@ -37,12 +38,12 @@ sudo apt remove mini-browser
 
 O `AppImage` é um formato que não precisa de instalação. Basta dar permissão de execução:
 
-1. Clique com o botão direito no arquivo `dist/mini-browser_2.0.0_amd64.AppImage`.
+1. Clique com o botão direito no arquivo `dist/mini-browser_*.AppImage`.
 2. Vá em **Propriedades** > **Permissões** > Marque **Permitir execução**.
 3. Ou via terminal:
    ```bash
-   chmod +x dist/mini-browser_2.0.0_amd64.AppImage
-   ./dist/mini-browser_2.0.0_amd64.AppImage
+   chmod +x dist/mini-browser_*.AppImage
+   ./dist/mini-browser_*.AppImage
    ```
 
 ---
@@ -53,6 +54,18 @@ Para remover os arquivos temporários de build:
 ```bash
 rm -rf dist/ out/
 ```
+
+---
+
+## 🔄 Fluxo de Atualização
+
+### Script Automatizado
+O script `install.sh` facilitado no README detecta se o Mini Browser já está presente no sistema. Se encontrar uma versão anterior, ele executa automaticamente o desinstalador antes de aplicar a nova versão, garantindo uma transição limpa.
+
+### Notificações In-App
+O Mini Browser agora verifica periodicamente novas releases no GitHub. Ao detectar uma versão superior:
+1. Uma notificação elegante em **Aço Azul** aparece no canto da tela.
+2. Ao clicar em "Atualizar", o link da release é aberto e o comando de instalação rápida é copiado para o seu clipboard por conveniência.
 
 ---
 

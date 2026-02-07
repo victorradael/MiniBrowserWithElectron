@@ -1,4 +1,4 @@
-# 🖥️ Mini Browser (v2.0)
+# 🖥️ Mini Browser
 
 Um navegador minimalista, elegante e focado em produtividade. O Mini Browser foi desenhado para ser uma ferramenta de referência leve, mantendo-se sempre à mão enquanto você trabalha em outras tarefas.
 
@@ -16,6 +16,7 @@ O Mini Browser abandona o visual de navegador padrão para uma experiência de a
 - **Always on Top**: Fixe a janela sobre outros aplicativos com um clique para referência contínua.
 - **Bitwarden Sidebar**: Gerenciador de senhas integrado via barra lateral redimensionável.
 - **Elegant Error Handling**: Tela de erro customizada para conexões falhas ou URLs inválidas.
+- **Atualização Automática**: Notificação visual em "Aço Azul" que avisa sobre novas versões e facilita o download.
 - **Atalhos Rápidos**: Feche instantaneamente a aplicação com `Ctrl + Q`.
 
 ---
@@ -35,8 +36,8 @@ Recomendamos baixar a versão oficial compilada para evitar necessidade de compi
 
 ### Linux
 
-#### Quick Install (Debian/Ubuntu/AppImage)
-You can install the latest version of Mini Browser with a single command:
+#### Quick Install & Update (Debian/Ubuntu/AppImage)
+You can install or update Mini Browser to the latest version with a single command. The script automatically detects and replaces existing versions:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
 ```
