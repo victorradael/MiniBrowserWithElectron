@@ -1,46 +1,46 @@
-# Guia de Instalação e Distribuição
+# Installation & Distribution Guide
 
-Este documento descreve como gerar os instaláveis do Mini Browser e como instalá-lo em sistemas Linux.
+This document describes how to generate the Mini Browser installers and how to install it on Linux systems.
 
-## ⬇️ Download e Instalação (Recomendado)
+## ⬇️ Download and Installation (Recommended)
 
-A maneira mais fácil de instalar é baixando a versão mais recente na página de **Releases** do GitHub:
+The easiest way to install is by downloading the latest version from the GitHub **Releases** page:
 
-👉 **[Baixar última versão (Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest)**
+👉 **[Download latest version (Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest)**
 
-1. Baixe o arquivo `.deb` (para instalação) ou `.AppImage` (para execução direta).
-2. Siga as instruções de instalação abaixo.
+1. Download the `.deb` file (for installation) or `.AppImage` (for direct execution).
+2. Follow the installation instructions below.
 
 ---
 
-## 🛠️ Gerando os Instaláveis Localmente (Desenvolvimento)
+## 🛠️ Generating Installers Locally (Development)
 
-## 📦 Instalação (Ubuntu/Debian)
+## 📦 Installation (Ubuntu/Debian)
 
-Se você gerou um arquivo `.deb`, pode instalá-lo via terminal:
+If you generated or downloaded a `.deb` file, you can install it via terminal:
 
-### Instalar:
+### Install:
 ```bash
-# Navegue até a pasta dist e instale o pacote gerado
+# Navigate to the download/dist folder and install the package
 sudo dpkg -i dist/mini-browser_*.deb
-# Caso falte dependências:
+# If dependencies are missing:
 sudo apt-get install -f
 ```
 
-### Desinstalar:
+### Uninstall:
 ```bash
 sudo apt remove mini-browser
 ```
 
 ---
 
-## 🚀 Execução via AppImage
+## 🚀 AppImage Execution
 
-O `AppImage` é um formato que não precisa de instalação. Basta dar permissão de execução:
+The `AppImage` format does not require installation. Just grant execution permission:
 
-1. Clique com o botão direito no arquivo `dist/mini-browser_*.AppImage`.
-2. Vá em **Propriedades** > **Permissões** > Marque **Permitir execução**.
-3. Ou via terminal:
+1. Right-click on the `dist/mini-browser_*.AppImage` file.
+2. Go to **Properties** > **Permissions** > Check **Allow executing file as program**.
+3. Or via terminal:
    ```bash
    chmod +x dist/mini-browser_*.AppImage
    ./dist/mini-browser_*.AppImage
@@ -48,57 +48,57 @@ O `AppImage` é um formato que não precisa de instalação. Basta dar permissã
 
 ---
 
-## 🧹 Limpeza (Desenvolvimento)
+## 🧹 Cleanup (Development)
 
-Para remover os arquivos temporários de build:
+To remove temporary build files:
 ```bash
 rm -rf dist/ out/
 ```
 
 ---
 
-## 🔄 Fluxo de Atualização
+## 🔄 Update Flow
 
-### Script Automatizado
-O script `install.sh` facilitado no README detecta se o Mini Browser já está presente no sistema. Se encontrar uma versão anterior, ele executa automaticamente o desinstalador antes de aplicar a nova versão, garantindo uma transição limpa.
+### Automated Script
+The `install.sh` script (linked in the README) automatically detects if Mini Browser is already present on the system. If it finds a previous version, it automatically runs the uninstaller before applying the new version, ensuring a clean transition.
 
-### Notificações In-App
-O Mini Browser agora verifica periodicamente novas releases no GitHub. Ao detectar uma versão superior:
-1. Uma notificação elegante em **Aço Azul** aparece no canto da tela.
-2. Ao clicar em "Atualizar", o link da release é aberto e o comando de instalação rápida é copiado para o seu clipboard por conveniência.
+### In-App Notifications
+Mini Browser now periodically checks for new releases on GitHub. When a newer version is detected:
+1. An elegant **Blue Steel** notification appears in the corner of the screen.
+2. Clicking "Update Now" opens the release link and copies the quick install command to your clipboard for convenience.
 
 ---
 
-## 🐧 Solução de Problemas (Linux Sandbox)
+## 🐧 Troubleshooting (Linux Sandbox)
 
-Se o aplicativo falhar ao iniciar com erro de "SUID sandbox helper", você pode:
+If the application fails to start with a "SUID sandbox helper" error, you can:
 
-1. **Rodar sem sandbox (Rápido)**: 
-   Adicione `--no-sandbox` ao comando de execução.
+1. **Run without sandbox (Quick)**:
+   Add `--no-sandbox` to the execution command.
 
-2. **Habilitar no Kernel (Recomendado)**:
+2. **Enable in Kernel (Recommended)**:
    ```bash
    sudo sysctl -w kernel.unprivileged_userns_clone=1
    ```
 
-3. **Verificar Limites e AppArmor**:
-   *   Certifique-se que `user.max_user_namespaces` não é 0.
-   *   Se estiver no Ubuntu 24.04+, pode ser necessário:
+3. **Check Limits and AppArmor**:
+   *   Ensure `user.max_user_namespaces` is not 0.
+   *   If on Ubuntu 24.04+, you might need:
        ```bash
        sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
        ```
 
 ---
 
-## 🔐 Considerações de Segurança
+## 🔐 Security Considerations
 
-Ao utilizar os comandos acima para resolver problemas de sandbox no Linux, esteja ciente das implicações:
+When using the above commands to resolve Linux sandbox issues, be aware of the implications:
 
-| Comando / Flag | Risco | Recomendação |
+| Command / Flag | Risk | Recommendation |
 | :--- | :--- | :--- |
-| `--no-sandbox` | Remove o isolamento entre o conteúdo web e seu sistema. | Use apenas para desenvolvimento e com URLs confiáveis. |
-| `unprivileged_userns_clone` | Aumenta a superfície de ataque para exploits de Kernel. | Necessário para Docker/Flatpak; mantenha habilitado se usar essas ferramentas. |
-| `apparmor_restrict_unprivileged_userns` | Remove uma trava específica do Ubuntu contra exploits de privilégio. | Prefira habilitar perfis específicos do AppArmor se estiver em ambiente de produção. |
+| `--no-sandbox` | Removes isolation between web content and your system. | Use only for development and with trusted URLs. |
+| `unprivileged_userns_clone` | Increases attack surface for Kernel exploits. | Required for Docker/Flatpak; keep enabled if using these tools. |
+| `apparmor_restrict_unprivileged_userns` | Removes a specific Ubuntu lock against privilege exploits. | Prefer enabling specific AppArmor profiles if in a production environment. |
 
 > [!IMPORTANT]
-> O sandbox é a defesa primária do navegador contra sites maliciosos. Nunca navegue em sites desconhecidos com a flag `--no-sandbox` ativa.
+> The sandbox is the browser's primary defense against malicious sites. Never browse unknown sites with the `--no-sandbox` flag active.

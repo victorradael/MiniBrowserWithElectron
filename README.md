@@ -1,38 +1,38 @@
 # 🖥️ Mini Browser
 
-Um navegador minimalista, elegante e focado em produtividade. O Mini Browser foi desenhado para ser uma ferramenta de referência leve, mantendo-se sempre à mão enquanto você trabalha em outras tarefas.
+A minimalist, elegant, and productivity-focused browser. Mini Browser was designed to be a lightweight reference tool, always at hand while you work on other tasks.
 
 ---
 
-## ✨ Identidade Visual e Experiência
-O Mini Browser abandona o visual de navegador padrão para uma experiência de aplicativo nativo moderno:
-- **Janela Frameless**: Interface sem bordas ou barras de título do sistema, maximizando o espaço de conteúdo.
-*   **Identidade Minimalista**: Ícone personalizado "Monitor" que reflete a proposta de ser sua segunda tela de trabalho.
-*   **Favicons Inteligentes**: O cabeçalho e o dashboard exibem automaticamente os ícones dos sites (favicons) com sistema de fallback resiliente.
-*   **Título Dinâmico**: O cabeçalho se comporta como uma aba inteligente, atualizando o título conforme você navega.
+## ✨ Visual Identity & Experience
+Mini Browser abandons the standard browser look for a modern native app experience:
+- **Frameless Window**: Interface without borders or system title bars, maximizing content space.
+- **Minimalist Identity**: Custom "Monitor" icon reflecting its purpose as your second work screen.
+- **Smart Favicons**: The header and dashboard automatically display site icons (favicons) with a resilient fallback system.
+- **Dynamic Title**: The header acts as a smart tab, updating the title as you navigate.
 
-## 🚀 Funcionalidades Principais
-- **Dashboard de Workspaces**: Salve e organize suas URLs frequentes com apelidos (aliases) personalizados.
-- **Always on Top**: Fixe a janela sobre outros aplicativos com um clique para referência contínua.
-- **Bitwarden Sidebar**: Gerenciador de senhas integrado via barra lateral redimensionável.
-- **Elegant Error Handling**: Tela de erro customizada para conexões falhas ou URLs inválidas.
-- **Atualização Automática**: Notificação visual em "Aço Azul" que avisa sobre novas versões e facilita o download.
-- **Atalhos Rápidos**: Feche instantaneamente a aplicação com `Ctrl + Q`.
+## 🚀 Key Features
+- **Workspaces Dashboard**: Save and organize your frequent URLs with custom aliases.
+- **Always on Top**: Pin the window over other apps with a single click for continuous reference.
+- **Bitwarden Sidebar**: Integrated password manager via a resizable sidebar.
+- **Elegant Error Handling**: Custom error screen for failed connections or invalid URLs.
+- **Automatic Updates**: Visual notification in "Blue Steel" style that warns about new versions and facilitates download.
+- **Quick Shortcuts**: Instantly close the application with `Ctrl + Q`.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🛠️ Tech Stack
 - **Engine**: Electron + Chromium
 - **Frontend**: React + Vite
-- **Estilização**: Tailwind CSS (Modern Dark Theme)
-- **Ícones**: Lucide Icons + Google/DuckDuckGo Favicon Services
-- **Persistência**: `electron-store` (JSON-based persistence)
+- **Styling**: Tailwind CSS (Modern Dark Theme)
+- **Icons**: Lucide Icons + Google/DuckDuckGo Favicon Services
+- **Persistence**: `electron-store` (JSON-based persistence)
 
-## 📦 Começando
+## 📦 Getting Started
 
-### Instalação para Usuários
-Recomendamos baixar a versão oficial compilada para evitar necessidade de compilação:
-👉 **[Baixar última versão (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
+### Installation for Users
+We recommend downloading the official compiled version to avoid the need for compilation:
+👉 **[Download latest version (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
 
 ### Linux
 
@@ -50,59 +50,58 @@ curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectro
 #### Manual Installation
 - Download the `.deb` or `.AppImage` from the [latest release](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest).
 
-### Para Desenvolvedores
-1.  **Clone e Instale**:
+### For Developers
+1.  **Clone and Install**:
     ```bash
     git clone https://github.com/victorradael/MiniBrowserWithElectron
     cd MiniBrowserWithElectron
     yarn
     ```
-2.  **Desenvolvimento**: `yarn dev`
-3.  **Build Local**: `yarn build:linux`
+2.  **Development**: `yarn dev`
+3.  **Local Build**: `yarn build:linux`
 
-### 🐧 Solução de Problemas (Linux)
-Se ao rodar `yarn dev` você encontrar o erro `FATAL:setuid_sandbox_host.cc`, você tem duas opções:
+### 🐧 Troubleshooting (Linux)
+If you encounter the `FATAL:setuid_sandbox_host.cc` error when running `yarn dev`, you have two options:
 
-#### 1. Solução Rápida (Bypass)
-Execute o comando ignorando o sandbox:
+#### 1. Quick Fix (Bypass)
+Run the command ignoring the sandbox:
 ```bash
 yarn dev:no-sandbox
 ```
 
-#### 2. Solução Definitiva (Permissões do Kernel)
-O erro ocorre porque muitas distribuições Linux desativam "unprivileged user namespaces" por segurança. Você pode habilitar temporariamente:
+#### 2. Definitive Solution (Kernel Permissions)
+The error occurs because many Linux distributions disable "unprivileged user namespaces" for security. You can enable it temporarily:
 ```bash
 sudo sysctl -w kernel.unprivileged_userns_clone=1
 ```
-Ou tornar permanente adicionando `kernel.unprivileged_userns_clone=1` em `/etc/sysctl.d/99-sysctl.conf`.
+Or make it permanent by adding `kernel.unprivileged_userns_clone=1` to `/etc/sysctl.d/99-sysctl.conf`.
 
-#### 3. Diagnóstico Avançado
-Se mesmo após o passo acima o erro persistir, verifique estes pontos:
+#### 3. Advanced Diagnosis
+If the error persists after the above step, check these points:
 
-*   **Limite de Namespaces**: Verifique se o limite não é zero:
+*   **Namespace Limit**: Check if the limit is not zero:
     ```bash
     sysctl user.max_user_namespaces
     ```
-    (Idealmente superior a 10000).
-*   **Restrições de AppArmor (Ubuntu 24.04+)**: Algumas distros bloqueiam namespaces para apps não-profileados:
+    (Ideally greater than 10000).
+*   **AppArmor Restrictions (Ubuntu 24.04+)**: Some distros block namespaces for unprofiled apps:
     ```bash
-    # Para testar se o AppArmor está bloqueando:
+    # To test if AppArmor is blocking:
     sudo dmesg | grep apparmor | grep -i "sandbox"
-    # Para desativar a restrição (temporário):
+    # To disable the restriction (temporary):
     sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
     ```
 
 > [!CAUTION]
-> **Segurança**: Desativar o sandbox ou alterar parâmetros do Kernel reduz o isolamento do sistema. Consulte o [Guia de Instalação](file:///home/radael/Documents/github.com/victorradael/MiniBrowserWithElectron/INSTALL.md#considerações-de-segurança) para entender as implicações antes de aplicar estas mudanças permanentemente.
+> **Security**: Disabling the sandbox or changing Kernel parameters reduces system isolation. Consult the [Installation Guide](INSTALL.md#security-considerations) to understand the implications before applying these changes permanently.
 
 ---
 
-## 🔐 Integração com Bitwarden
-Em vez de extensões complexas, usamos o **Web Vault** oficial em uma sidebar:
-1.  Abra a sidebar pelo ícone de **Escudo** ou botão na Dashboard.
-2.  Redimensione a largura puxando a borda lateral.
-3.  Suas credenciais estarão sempre à mão para copiar/colar de forma segura.
+## 🔐 Bitwarden Integration
+Instead of complex extensions, we use the official **Web Vault** in a sidebar:
+1.  Open the sidebar via the **Shield** icon or button on the Dashboard.
+2.  Resize the width by pulling the side edge.
+3.  Your credentials will always be at hand to copy/paste securely.
 
-## 📄 Licença
-Este projeto está licenciado sob a licença MIT. Criado por Victor Radael.
-
+## 📄 License
+This project is licensed under the MIT license. Created by Victor Radael.

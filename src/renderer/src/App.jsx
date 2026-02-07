@@ -117,12 +117,12 @@ function App() {
 
         const handleFail = (e) => {
             console.error('Webview failed to load:', e)
-            setLoadError(e.errorDescription || 'Erro ao carregar a página. Verifique a URL ou sua conexão.')
+            setLoadError(e.errorDescription || 'Error loading page. Check the URL or your connection.')
         }
 
         const handleStart = () => {
             setLoadError(null)
-            setPageTitle('Carregando...')
+            setPageTitle('Loading...')
         }
 
         const handleTitle = (e) => {
@@ -162,7 +162,7 @@ function App() {
                         </div>
                         <div className="flex flex-col min-w-0">
                             <span className="text-xs font-medium text-gray-200 truncate leading-tight">
-                                {pageTitle || 'Navegador'}
+                                {pageTitle || 'Browser'}
                             </span>
                             <span className="text-[10px] text-gray-500 truncate leading-tight opacity-70">
                                 {currentUrl}
@@ -192,7 +192,7 @@ function App() {
                 {loadError && (
                     <div className="absolute inset-0 z-10 bg-gray-900 flex flex-col items-center justify-center p-8 text-center">
                         <Monitor size={48} className="text-red-500 mb-4 opacity-50" />
-                        <h2 className="text-xl font-bold text-gray-100 mb-2">Ops! Não conseguimos chegar lá.</h2>
+                        <h2 className="text-xl font-bold text-gray-100 mb-2">Oops! We couldn't get there.</h2>
                         <p className="text-gray-400 max-w-md mb-6">{loadError}</p>
                         <button
                             onClick={() => {
@@ -201,7 +201,7 @@ function App() {
                             }}
                             className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium"
                         >
-                            Tentar Novamente
+                            Try Again
                         </button>
                     </div>
                 )}
@@ -394,7 +394,7 @@ function App() {
 
             {/* Watermark Helper - Moved to Bottom Left */}
             <div className="fixed bottom-4 left-4 text-[10px] text-gray-600 pointer-events-none select-none uppercase tracking-widest bg-gray-900/50 px-2 py-1 rounded border border-gray-800/50 z-[100]">
-                Ctrl + Q para fechar
+                Ctrl + Q to close
             </div>
 
             {/* Version Watermark - Bottom Right */}

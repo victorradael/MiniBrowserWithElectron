@@ -43,7 +43,7 @@ export default function UpdateNotifier({ currentVersion }) {
         // Or better, we could provide the one-liner install command to the clipboard
         const installCmd = `curl -fsSL https://raw.githubusercontent.com/${REPO}/master/scripts/install.sh | bash`
         navigator.clipboard.writeText(installCmd)
-        alert('Comando de instalação copiado! Cole no seu terminal para atualizar.')
+        alert('Install command copied! Paste in your terminal to update.')
     }
 
     if (!isVisible || isDismissed) return null
@@ -60,17 +60,17 @@ export default function UpdateNotifier({ currentVersion }) {
 
                 <div className="relative flex flex-col min-w-0">
                     <h3 className="font-bold text-white leading-tight">
-                        Nova Versão Disponível!
+                        New Version Available!
                     </h3>
                     <p className="text-xs text-slate-300/90 font-medium">
-                        Versão {latestVersion} já está pronta.
+                        Version {latestVersion} is ready.
                     </p>
                     <button
                         onClick={handleUpdateClick}
                         className="mt-2 flex items-center justify-center gap-2 bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 py-1.5 px-3 rounded-lg text-xs font-bold transition-all border border-blue-400/30 no-drag"
                     >
                         <Download size={14} className="text-blue-300" />
-                        Atualizar Agora
+                        Update Now
                     </button>
                 </div>
 
