@@ -1,8 +1,8 @@
 {
-  "name": "mini-browser",
-  "productName": "Mini Browser",
+  "name": "phantom-browser",
+  "productName": "Phantom",
   "version": "2.4.0",
-  "description": "A minimal browser for focused work",
+  "description": "A silent, focused browser for the shadows.",
   "main": "out/main/index.js",
   "scripts": {
     "start": "electron-vite preview",
@@ -16,7 +16,9 @@
   "keywords": [
     "electron",
     "browser",
-    "productivity"
+    "productivity",
+    "phantom",
+    "privacy"
   ],
   "author": "Victor Radael <victorradael@gmail.com>",
   "license": "MIT",
@@ -57,8 +59,8 @@
     "vite": "^7.3.1"
   },
   "build": {
-    "appId": "com.victorradael.minibrowser",
-    "productName": "Mini Browser",
+    "appId": "com.victorradael.phantom",
+    "productName": "Phantom",
     "directories": {
       "output": "dist"
     },
@@ -68,7 +70,15 @@
         "deb"
       ],
       "category": "Utility",
-      "icon": "resources/icon.png"
+      "icon": "resources/icon.png",
+      "executableName": "mini-browser"
+    },
+    "deb": {
+      "packageName": "mini-browser",
+      "artifactName": "mini-browser_${version}_${arch}.${ext}"
+    },
+    "appImage": {
+      "artifactName": "mini-browser_${version}.${ext}"
     },
     "files": [
       "out/**/*",

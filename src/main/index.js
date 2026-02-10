@@ -15,12 +15,16 @@ app.commandLine.appendSwitch('disable-gpu-process-crash-log')
 // Allow Electron to decide the best platform (Wayland vs X11) automatically
 // app.commandLine.appendSwitch('ozone-platform-hint', 'auto')
 
+// PRESERVE USER DATA: Explicitly set path to old "Mini Browser" directory to avoid data loss
+// This MUST be done before app.setName changes the name to "Phantom"
+app.setPath('userData', join(app.getPath('appData'), 'Mini Browser'))
+
 // Set the application name clearly for the window manager (helpful for GNOME)
-app.setName('Mini Browser')
+app.setName('Phantom')
 
 // Linux: Explicitly link to the desktop file for icon association in dev mode
 if (is.dev && process.platform === 'linux') {
-    app.setDesktopName('mini-browser-dev.desktop')
+    app.setDesktopName('phantom-dev.desktop')
 }
 
 function createWindow() {
@@ -128,7 +132,7 @@ app.on('web-contents-created', (_, contents) => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
     // Set app user model id for windows
-    electronApp.setAppUserModelId('com.victorradael.minibrowser')
+    electronApp.setAppUserModelId('com.victorradael.phantom')
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.

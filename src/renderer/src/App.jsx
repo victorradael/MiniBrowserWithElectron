@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Monitor, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
+import { Plus, Trash2, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Globe } from 'lucide-react'
 import ScrollIndicator from './components/ScrollIndicator'
 import InteractiveBackground from './components/InteractiveBackground'
 import UpdateNotifier from './components/UpdateNotifier'
@@ -121,8 +121,7 @@ function App() {
         }
 
         const handleStart = () => {
-            setLoadError(null)
-            setPageTitle('Loading...')
+            setPageTitle('Materializing...')
         }
 
         const handleTitle = (e) => {
@@ -173,7 +172,7 @@ function App() {
                 <div className="flex items-center gap-2 shrink-0">
                     <button
                         onClick={toggleAlwaysOnTop}
-                        className={`p-1.5 rounded no-drag ${isAlwaysOnTop ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-400'}`}
+                        className={`p-1.5 rounded no-drag ${isAlwaysOnTop ? 'bg-zinc-600 text-white' : 'hover:bg-gray-700 text-gray-400'}`}
                         title="Toggle Always on Top"
                     >
                         {isAlwaysOnTop ? <Pin size={16} /> : <PinOff size={16} />}
@@ -191,15 +190,15 @@ function App() {
             <div className="flex-1 w-full bg-white relative">
                 {loadError && (
                     <div className="absolute inset-0 z-10 bg-gray-900 flex flex-col items-center justify-center p-8 text-center">
-                        <Monitor size={48} className="text-red-500 mb-4 opacity-50" />
-                        <h2 className="text-xl font-bold text-gray-100 mb-2">Oops! We couldn't get there.</h2>
+                        <span className="text-6xl mb-4 opacity-50">👻</span>
+                        <h2 className="text-xl font-bold text-gray-100 mb-2">The Phantom cannot reach this realm.</h2>
                         <p className="text-gray-400 max-w-md mb-6">{loadError}</p>
                         <button
                             onClick={() => {
                                 const webview = webviewRef.current
                                 if (webview) webview.reload()
                             }}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium"
+                            className="px-6 py-2 bg-zinc-600 hover:bg-zinc-500 text-white rounded-lg transition-colors font-medium"
                         >
                             Try Again
                         </button>
@@ -230,15 +229,15 @@ function App() {
                 <div className="max-w-2xl mx-auto">
                     <header className="mb-8 flex items-center justify-between draggable">
                         <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <Monitor className="text-blue-500" />
-                            Mini Browser
+                            <span className="text-4xl">👻</span>
+                            Phantom
                         </h1>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                                 className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 flex items-center gap-2 transition-colors border border-gray-700 no-drag"
                             >
-                                <Shield size={16} className="text-blue-500" />
+                                <Shield size={16} className="text-zinc-400" />
                                 <span className="text-sm">Bitwarden</span>
                             </button>
                         </div>
@@ -266,7 +265,7 @@ function App() {
                             </div>
                             <button
                                 onClick={addUrl}
-                                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors w-full"
+                                className="bg-zinc-600 hover:bg-zinc-500 text-white px-6 py-2 rounded-lg font-medium transition-colors w-full"
                             >
                                 Add to Dashboard
                             </button>
@@ -366,13 +365,13 @@ function App() {
                 >
                     {/* Resizer Handle */}
                     <div
-                        className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500 transition-colors z-50"
+                        className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-zinc-500 transition-colors z-50"
                         onMouseDown={() => setIsResizing(true)}
                     ></div>
 
                     <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-3 shrink-0 draggable">
                         <span className="text-sm font-semibold text-gray-200 flex items-center gap-2">
-                            <Shield size={14} className="text-blue-500" /> Bitwarden Vault
+                            <Shield size={14} className="text-zinc-400" /> Bitwarden Vault
                         </span>
                         <button
                             onClick={() => setIsSidebarOpen(false)}
