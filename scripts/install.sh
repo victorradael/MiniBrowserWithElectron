@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Mini Browser Installation Script
+# Phantom Installation Script
 # Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
 
 set -e
 
 REPO="victorradael/MiniBrowserWithElectron"
-APP_NAME="mini-browser"
+APP_NAME="mini-browser"  # Keep old name for backward compatibility with existing installations
 GITHUB_API="https://api.github.com/repos/$REPO/releases/latest"
 
 # Check dependencies
@@ -114,13 +114,13 @@ sudo curl -s -L "$ICON_URL" -o /opt/mini-browser/icon.png
 
 cat <<EOF > mini-browser-custom.desktop
 [Desktop Entry]
-Name=Mini Browser
+Name=Phantom
 Comment=A minimal browser for focused work
 Exec=mini-browser --no-sandbox
 Icon=/opt/mini-browser/icon.png
 Terminal=false
 Type=Application
-StartupWMClass=Mini Browser
+StartupWMClass=Phantom
 Categories=Utility;Network;WebBrowser;
 EOF
 
@@ -136,4 +136,4 @@ mv mini-browser-custom.desktop ~/.local/share/applications/mini-browser.desktop
 [ -x "$(command -v update-desktop-database)" ] && update-desktop-database ~/.local/share/applications || true
 
 rm -rf "$TEMP_DIR"
-echo "Mini Browser $VERSION installed successfully!"
+echo "Phantom $VERSION installed successfully!"

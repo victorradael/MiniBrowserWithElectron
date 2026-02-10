@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Mini Browser Deinstallation Script
+# Phantom Deinstallation Script
 # Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/uninstall.sh | bash
 
-echo "Starting uninstallation of Mini Browser..."
+echo "Starting uninstallation of Phantom (formerly Mini Browser)..."
 
 # Check if installed via apt
 if dpkg -l | grep -q mini-browser; then
@@ -17,10 +17,11 @@ echo "Cleaning up files and icons..."
 [ -d "/opt/Mini Browser" ] && sudo rm -rf "/opt/Mini Browser"
 sudo rm -f /usr/bin/mini-browser
 
-# Check for Desktop Entries (both custom and system)
+# Check for Desktop Entries (both old and new names)
 echo "Removing desktop entries..."
 rm -f "$HOME/.local/share/applications/mini-browser.desktop"
+rm -f "$HOME/.local/share/applications/phantom.desktop"
 # We don't remove system-wide ones as they should be handled by apt remove,
-# but we ensures our override is gone.
+# but we ensure our overrides are gone.
 
-echo "Mini Browser has been uninstalled."
+echo "Phantom has been uninstalled."
