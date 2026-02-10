@@ -11,74 +11,76 @@ const InteractiveBackground = () => {
         let width = window.innerWidth;
         let height = window.innerHeight;
 
+        // Fog "puffs"
         const particles = [];
-        const colors = ['#3b82f6', '#60a5fa', '#1d4ed8', '#93c5fd'];
-        const mouse = { x: null, y: null, radius: 150 };
-        let time = 0;
+        const mouse = { x: -1000, y: -1000, radius: 300 }; // Large interaction radius
 
-        class Particle {
+        class FogPuff {
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.size = Math.random() * 1.5 + 0.5;
-                // Store relative position (0.0 to 1.0)
-                this.relX = this.x / width;
-                this.relY = this.y / height;
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.density = (Math.random() * 20) + 1;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                // Individual wave parameters - Slowed down
-                this.angle = Math.random() * Math.PI * 2;
-                this.velocity = Math.random() * 0.005 + 0.002;
-                this.amplitude = Math.random() * 15 + 5;
+                // Larger, more visible puffs
+                this.size = Math.random() * 150 + 120;
+
+                // Movement
+                this.vx = (Math.random() - 0.5) * 0.3; // Slightly faster drift
+                this.vy = (Math.random() - 0.5) * 0.3;
+
+                // Appearance - Much more visible
+                this.opacity = Math.random() * 0.12 + 0.08; // Increased for visibility
+                this.growth = (Math.random() - 0.5) * 0.15;
             }
 
             draw() {
-                ctx.fillStyle = this.color;
+                // Create a radial gradient for the "puff" look
+                // Darker monochromatic palette to match low-poly icon
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.size
+                );
 
-                // Add subtle glow
-                ctx.shadowBlur = 4;
-                ctx.shadowColor = this.color;
+                // Using Zinc/Gray colors (darker, less blue)
+                // Zinc-500: 113, 113, 122
+                // Zinc-700: 63, 63, 70
+                // Zinc-800: 39, 39, 42
+                gradient.addColorStop(0, `rgba(113, 113, 122, ${this.opacity})`); // Center - zinc-500
+                gradient.addColorStop(0.5, `rgba(63, 63, 70, ${this.opacity * 0.5})`); // Mid - zinc-700
+                gradient.addColorStop(1, `rgba(39, 39, 42, 0)`); // Edge - zinc-800
 
+                ctx.fillStyle = gradient;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.closePath();
                 ctx.fill();
-
-                ctx.shadowBlur = 0;
             }
 
             update() {
-                // Wave rotation/oscillation
-                this.angle += this.velocity;
-                const waveX = Math.cos(this.angle) * this.amplitude;
-                const waveY = Math.sin(this.angle) * this.amplitude;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.size += this.growth;
 
-                const targetX = this.baseX + waveX;
-                const targetY = this.baseY + waveY;
+                // Breathing size effect
+                if (this.size > 300 || this.size < 100) this.growth *= -1;
 
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
+                // Mouse interaction: Pushed away by the "Phantom" presence
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < mouse.radius) {
-                    let forceDirectionX = dx / distance;
-                    let forceDirectionY = dy / distance;
-                    let maxDistance = mouse.radius;
-                    let force = (maxDistance - distance) / maxDistance;
-                    let directionX = forceDirectionX * force * this.density;
-                    let directionY = forceDirectionY * force * this.density;
+                    const angle = Math.atan2(dy, dx);
+                    const force = (mouse.radius - distance) / mouse.radius;
+                    const pushX = Math.cos(angle) * force * 2;
+                    const pushY = Math.sin(angle) * force * 2;
 
-                    this.x -= directionX;
-                    this.y -= directionY;
-                } else {
-                    // Smooth return to target (which is base + wave)
-                    const dxT = this.x - targetX;
-                    const dyT = this.y - targetY;
-                    this.x -= dxT / 20;
-                    this.y -= dyT / 20;
+                    this.x -= pushX;
+                    this.y -= pushY;
                 }
+
+                // Screen wrapping
+                if (this.x < -this.size) this.x = width + this.size;
+                if (this.x > width + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = height + this.size;
+                if (this.y > height + this.size) this.y = -this.size;
             }
         }
 
@@ -88,69 +90,35 @@ const InteractiveBackground = () => {
             canvas.width = width;
             canvas.height = height;
 
-            // Reposition particles based on relative coordinates
-            particles.forEach(p => {
-                p.x = p.relX * width;
-                p.y = p.relY * height;
-                p.baseX = p.x;
-                p.baseY = p.y;
-            });
-
-            // Dynamic Density: 1 particle per ~25000 pixels
-            // 1920x1080 = ~2M pixels -> ~80 particles
-            // 1366x768 = ~1M pixels -> ~40 particles
+            // Re-populate fog based on screen size
+            particles.length = 0;
             const area = width * height;
-            const targetCount = Math.floor(area / 25000);
+            // Higher density for more visible fog
+            const targetCount = Math.floor(area / 10000);
 
-            if (particles.length < targetCount) {
-                // Add more particles
-                const toAdd = targetCount - particles.length;
-                for (let i = 0; i < toAdd; i++) {
-                    particles.push(new Particle());
-                }
-            } else if (particles.length > targetCount) {
-                // Remove excess particles
-                particles.splice(targetCount);
+            for (let i = 0; i < targetCount; i++) {
+                particles.push(new FogPuff());
             }
         };
 
         window.addEventListener('resize', resize);
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
 
         // Initial setup
         resize();
 
-        const connect = () => {
-            for (let a = 0; a < particles.length; a++) {
-                for (let b = a; b < particles.length; b++) {
-                    let dx = particles[a].x - particles[b].x;
-                    let dy = particles[a].y - particles[b].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 130) {
-                        const opacityValue = 1 - (distance / 130);
-                        ctx.strokeStyle = `rgba(59, 130, 246, ${opacityValue * 0.15})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
         const animate = () => {
             ctx.clearRect(0, 0, width, height);
-            time += 0.005;
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].draw();
-                particles[i].update();
-            }
-            connect();
+
+            // Draw all fog puffs
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
             animationFrameId = requestAnimationFrame(animate);
         };
 
