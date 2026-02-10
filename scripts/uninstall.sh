@@ -1,27 +1,33 @@
-#!/bin/bash
-
 # Phantom Deinstallation Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/uninstall.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/phantom/master/scripts/uninstall.sh | bash
 
-echo "Starting uninstallation of Phantom (formerly Mini Browser)..."
+echo "Starting uninstallation of Phantom..."
 
-# Check if installed via apt
+# 1. Remove .deb package (phantom)
+if dpkg -l | grep -q phantom; then
+    echo "Removing Phantom .deb package..."
+    sudo apt-get remove -y phantom
+fi
+
+# 2. Remove Legacy .deb package (mini-browser)
 if dpkg -l | grep -q mini-browser; then
-    echo "Removing .deb package..."
+    echo "Removing Legacy Mini Browser .deb package..."
     sudo apt-get remove -y mini-browser
 fi
 
-# Check for various installation paths and icons
-echo "Cleaning up files and icons..."
+# 3. Clean up Phantom files
+echo "Cleaning up Phantom files..."
+[ -d "/opt/phantom" ] && sudo rm -rf "/opt/phantom"
+sudo rm -f /usr/local/bin/phantom
+sudo rm -f /usr/bin/phantom
+rm -f "$HOME/.local/share/applications/phantom.desktop"
+
+# 4. Clean up Legacy Mini Browser files (if any remain)
+echo "Cleaning up legacy files..."
 [ -d "/opt/mini-browser" ] && sudo rm -rf "/opt/mini-browser"
 [ -d "/opt/Mini Browser" ] && sudo rm -rf "/opt/Mini Browser"
+sudo rm -f /usr/local/bin/mini-browser
 sudo rm -f /usr/bin/mini-browser
-
-# Check for Desktop Entries (both old and new names)
-echo "Removing desktop entries..."
 rm -f "$HOME/.local/share/applications/mini-browser.desktop"
-rm -f "$HOME/.local/share/applications/phantom.desktop"
-# We don't remove system-wide ones as they should be handled by apt remove,
-# but we ensure our overrides are gone.
 
-echo "Phantom has been uninstalled."
+echo "Phantom (and legacy components) have been uninstalled."

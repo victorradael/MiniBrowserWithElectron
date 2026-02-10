@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Phantom Installation Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/victorradael/phantom/master/scripts/install.sh | bash
 
 set -e
 
-REPO="victorradael/MiniBrowserWithElectron"
-APP_NAME="mini-browser"  # Keep old name for backward compatibility with existing installations
+REPO="victorradael/phantom"
+APP_NAME="phantom"
 GITHUB_API="https://api.github.com/repos/$REPO/releases/latest"
 
 # Check dependencies
@@ -15,18 +15,27 @@ if ! command -v curl &> /dev/null; then
     exit 1
 fi
 
-# IMPROVEMENT: Check if already installed and uninstall if necessary
+# IMPROVEMENT: Check if already installed (Phantom or Legacy Mini Browser) and uninstall if necessary
 echo "Checking for existing installation..."
 ALREADY_INSTALLED=false
-if dpkg -l | grep -q mini-browser; then
-    ALREADY_INSTALLED=true
-elif [ -d "/opt/mini-browser" ]; then
+
+# Check for Legacy Mini Browser
+if dpkg -l | grep -q mini-browser || [ -d "/opt/mini-browser" ]; then
+    echo "Legacy 'Mini Browser' detected. Uninstalling to upgrade to Phantom v3.0.0..."
+    # Try to run the uninstaller if it exists locally or download it
+    # Since we are upgrading, we can interpret 'uninstall.sh' from the current repo (which handles both)
+    curl -fsSL "https://raw.githubusercontent.com/$REPO/master/scripts/uninstall.sh" | bash || {
+         echo "Warning: Uninstallation script encountered an error. Attempting to continue..."
+    }
+fi
+
+# Check for previous Phantom installation
+if dpkg -l | grep -q phantom || [ -d "/opt/phantom" ]; then
     ALREADY_INSTALLED=true
 fi
 
 if [ "$ALREADY_INSTALLED" = true ]; then
-    echo "Existing installation detected. Running uninstaller before proceeding..."
-    # Download and run the uninstaller directly from the repo to ensure it's up to date
+    echo "Existing Phantom installation detected. Running uninstaller before proceeding..."
     curl -fsSL "https://raw.githubusercontent.com/$REPO/master/scripts/uninstall.sh" | bash || {
         echo "Warning: Uninstallation script encountered an error. Attempting to continue installation anyway..."
     }
@@ -96,28 +105,28 @@ cd "$TEMP_DIR"
 
 if [ "$INSTALL_TYPE" == "appimage" ]; then
     echo "Downloading and setting up AppImage..."
-    curl -L "$DOWNLOAD_URL" -o mini-browser.AppImage
-    chmod +x mini-browser.AppImage
-    sudo mkdir -p /opt/mini-browser
-    sudo mv mini-browser.AppImage /opt/mini-browser/mini-browser
+    curl -L "$DOWNLOAD_URL" -o phantom.AppImage
+    chmod +x phantom.AppImage
+    sudo mkdir -p /opt/phantom
+    sudo mv phantom.AppImage /opt/phantom/phantom
 else
     echo "Downloading and installing .deb package..."
-    curl -L "$DOWNLOAD_URL" -o mini-browser.deb
-    sudo apt-get update && sudo apt-get install -y ./mini-browser.deb
+    curl -L "$DOWNLOAD_URL" -o phantom.deb
+    sudo apt-get update && sudo apt-get install -y ./phantom.deb
 fi
 
 # ICON AND DESKTOP ENTRY (Unified for both types to ensure correct icon)
 echo "Setting up application icon and menu shortcut..."
-sudo mkdir -p /opt/mini-browser
+sudo mkdir -p /opt/phantom
 ICON_URL="https://raw.githubusercontent.com/$REPO/master/resources/icon.png"
-sudo curl -s -L "$ICON_URL" -o /opt/mini-browser/icon.png
+sudo curl -s -L "$ICON_URL" -o /opt/phantom/icon.png
 
-cat <<EOF > mini-browser-custom.desktop
+cat <<EOF > phantom.desktop
 [Desktop Entry]
 Name=Phantom
-Comment=A minimal browser for focused work
-Exec=mini-browser --no-sandbox
-Icon=/opt/mini-browser/icon.png
+Comment=A silent, focused browser for the shadows
+Exec=phantom --no-sandbox
+Icon=/opt/phantom/icon.png
 Terminal=false
 Type=Application
 StartupWMClass=Phantom
@@ -126,11 +135,11 @@ EOF
 
 # Use a standard bin link for appimage
 if [ "$INSTALL_TYPE" == "appimage" ]; then
-    sudo ln -sf /opt/mini-browser/mini-browser /usr/local/bin/mini-browser
+    sudo ln -sf /opt/phantom/phantom /usr/local/bin/phantom
 fi
 
 mkdir -p ~/.local/share/applications
-mv mini-browser-custom.desktop ~/.local/share/applications/mini-browser.desktop
+mv phantom.desktop ~/.local/share/applications/phantom.desktop
 
 # Force database update
 [ -x "$(command -v update-desktop-database)" ] && update-desktop-database ~/.local/share/applications || true

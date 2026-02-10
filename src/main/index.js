@@ -15,9 +15,23 @@ app.commandLine.appendSwitch('disable-gpu-process-crash-log')
 // Allow Electron to decide the best platform (Wayland vs X11) automatically
 // app.commandLine.appendSwitch('ozone-platform-hint', 'auto')
 
-// PRESERVE USER DATA: Explicitly set path to old "Mini Browser" directory to avoid data loss
-// This MUST be done before app.setName changes the name to "Phantom"
-app.setPath('userData', join(app.getPath('appData'), 'Mini Browser'))
+// MIGRATION: Check if upgrading from Mini Browser
+// If so, move user data to new Phantom directory
+const phantomPath = app.getPath('userData') // Default: ~/.config/Phantom
+const miniBrowserPath = join(app.getPath('appData'), 'Mini Browser')
+
+if (fs.existsSync(miniBrowserPath) && !fs.existsSync(phantomPath)) {
+    try {
+        console.log('Migrating data from Mini Browser to Phantom...')
+        fs.renameSync(miniBrowserPath, phantomPath)
+        console.log('Migration successful.')
+    } catch (err) {
+        console.error('Migration failed:', err)
+        // Fallback: Use old path to ensure data availability? 
+        // Or just let it start fresh. 
+        // Decided: Let it create new if layout fails, but log error.
+    }
+}
 
 // Set the application name clearly for the window manager (helpful for GNOME)
 app.setName('Phantom')

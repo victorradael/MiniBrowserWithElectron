@@ -6,7 +6,7 @@ This document describes how to generate the Phantom installers and how to instal
 
 The easiest way to install is by downloading the latest version from the GitHub **Releases** page:
 
-👉 **[Download latest version (Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest)**
+👉 **[Download latest version (Releases)](https://github.com/victorradael/phantom/releases/latest)**
 
 1. Download the `.deb` file (for installation) or `.AppImage` (for direct execution).
 2. Follow the installation instructions below.
@@ -22,14 +22,14 @@ If you generated or downloaded a `.deb` file, you can install it via terminal:
 ### Install:
 ```bash
 # Navigate to the download/dist folder and install the package
-sudo dpkg -i dist/mini-browser_*.deb
+sudo dpkg -i dist/phantom_*.deb
 # If dependencies are missing:
 sudo apt-get install -f
 ```
 
 ### Uninstall:
 ```bash
-sudo apt remove mini-browser
+sudo apt remove phantom
 ```
 
 ---
@@ -38,12 +38,12 @@ sudo apt remove mini-browser
 
 The `AppImage` format does not require installation. Just grant execution permission:
 
-1. Right-click on the `dist/mini-browser_*.AppImage` file.
+1. Right-click on the `dist/phantom_*.AppImage` file.
 2. Go to **Properties** > **Permissions** > Check **Allow executing file as program**.
 3. Or via terminal:
    ```bash
-   chmod +x dist/mini-browser_*.AppImage
-   ./dist/mini-browser_*.AppImage
+   chmod +x dist/phantom_*.AppImage
+   ./dist/phantom_*.AppImage
    ```
 
 ---

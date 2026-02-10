@@ -32,29 +32,29 @@ Phantom abandons the standard browser look for a modern native app experience:
 
 ### Installation for Users
 We recommend downloading the official compiled version to avoid the need for compilation:
-👉 **[Download latest version (GitHub Releases)](https://github.com/victorradael/MiniBrowserWithElectron/releases)**
+👉 **[Download latest version (GitHub Releases)](https://github.com/victorradael/phantom/releases)**
 
 ### Linux
 
 #### Quick Install & Update (Debian/Ubuntu/AppImage)
 You can install or update Phantom to the latest version with a single command. The script automatically detects and replaces existing versions:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/victorradael/phantom/master/scripts/install.sh | bash
 ```
 
 To uninstall:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/victorradael/phantom/master/scripts/uninstall.sh | bash
 ```
 
 #### Manual Installation
-- Download the `.deb` or `.AppImage` from the [latest release](https://github.com/victorradael/MiniBrowserWithElectron/releases/latest).
+- Download the `.deb` or `.AppImage` from the [latest release](https://github.com/victorradael/phantom/releases/latest).
 
 ### For Developers
 1.  **Clone and Install**:
     ```bash
-    git clone https://github.com/victorradael/MiniBrowserWithElectron
-    cd MiniBrowserWithElectron
+    git clone https://github.com/victorradael/phantom
+    cd phantom
     yarn
     ```
 2.  **Development**: `yarn dev`

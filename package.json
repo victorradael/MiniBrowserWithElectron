@@ -1,7 +1,7 @@
 {
-  "name": "phantom-browser",
+  "name": "phantom",
   "productName": "Phantom",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "A silent, focused browser for the shadows.",
   "main": "out/main/index.js",
   "scripts": {
@@ -71,14 +71,14 @@
       ],
       "category": "Utility",
       "icon": "resources/icon.png",
-      "executableName": "mini-browser"
+      "executableName": "phantom"
     },
     "deb": {
-      "packageName": "mini-browser",
-      "artifactName": "mini-browser_${version}_${arch}.${ext}"
+      "packageName": "phantom",
+      "artifactName": "phantom_${version}_${arch}.${ext}"
     },
     "appImage": {
-      "artifactName": "mini-browser_${version}.${ext}"
+      "artifactName": "phantom_${version}.${ext}"
     },
     "files": [
       "out/**/*",
