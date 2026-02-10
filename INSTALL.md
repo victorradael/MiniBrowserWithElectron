@@ -1,6 +1,6 @@
 # Installation & Distribution Guide
 
-This document describes how to generate the Mini Browser installers and how to install it on Linux systems.
+This document describes how to generate the Phantom installers and how to install it on Linux systems.
 
 ## ⬇️ Download and Installation (Recommended)
 
@@ -60,10 +60,10 @@ rm -rf dist/ out/
 ## 🔄 Update Flow
 
 ### Automated Script
-The `install.sh` script (linked in the README) automatically detects if Mini Browser is already present on the system. If it finds a previous version, it automatically runs the uninstaller before applying the new version, ensuring a clean transition.
+The `install.sh` script (linked in the README) automatically detects if Phantom (or Mini Browser) is already present on the system. If it finds a previous version, it automatically runs the uninstaller before applying the new version, ensuring a clean transition.
 
 ### In-App Notifications
-Mini Browser now periodically checks for new releases on GitHub. When a newer version is detected:
+Phantom now periodically checks for new releases on GitHub. When a newer version is detected:
 1. An elegant **Blue Steel** notification appears in the corner of the screen.
 2. Clicking "Update Now" opens the release link and copies the quick install command to your clipboard for convenience.
 

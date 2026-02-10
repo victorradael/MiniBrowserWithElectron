@@ -1,13 +1,13 @@
-# 🖥️ Mini Browser
+# 👻 Phantom
 
-A minimalist, elegant, and productivity-focused browser. Mini Browser was designed to be a lightweight reference tool, always at hand while you work on other tasks.
+A minimalist, elegant, and productivity-focused browser. Phantom was designed to be a lightweight reference tool, always at hand while you work on other tasks.
 
 ---
 
 ## ✨ Visual Identity & Experience
-Mini Browser abandons the standard browser look for a modern native app experience:
+Phantom abandons the standard browser look for a modern native app experience:
 - **Frameless Window**: Interface without borders or system title bars, maximizing content space.
-- **Minimalist Identity**: Custom "Monitor" icon reflecting its purpose as your second work screen.
+- **Minimalist Identity**: Ghost emoji 👻 icon reflecting its stealthy, focused nature.
 - **Smart Favicons**: The header and dashboard automatically display site icons (favicons) with a resilient fallback system.
 - **Dynamic Title**: The header acts as a smart tab, updating the title as you navigate.
 
@@ -37,7 +37,7 @@ We recommend downloading the official compiled version to avoid the need for com
 ### Linux
 
 #### Quick Install & Update (Debian/Ubuntu/AppImage)
-You can install or update Mini Browser to the latest version with a single command. The script automatically detects and replaces existing versions:
+You can install or update Phantom to the latest version with a single command. The script automatically detects and replaces existing versions:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorradael/MiniBrowserWithElectron/master/scripts/install.sh | bash
 ```
