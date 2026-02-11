@@ -3,6 +3,7 @@ import { Plus, Trash2, ArrowLeft, Pin, PinOff, Shield, Sidebar, SidebarClose, Gl
 import ScrollIndicator from './components/ScrollIndicator'
 import InteractiveBackground from './components/InteractiveBackground'
 import UpdateNotifier from './components/UpdateNotifier'
+import GhostLogo from './components/GhostLogo'
 
 const getFavicon = (url) => {
     try {
@@ -54,6 +55,18 @@ function App() {
     const [newAlias, setNewAlias] = useState('')
     const [dashboardContainer, setDashboardContainer] = useState(null)
     const dashboardRef = useRef(null)
+
+    // Ghost Effect State
+    const [isGhostHidden, setIsGhostHidden] = useState(false)
+    const ghostTimeoutRef = useRef(null)
+
+    const handleGhostTrigger = () => {
+        setIsGhostHidden(true)
+        if (ghostTimeoutRef.current) clearTimeout(ghostTimeoutRef.current)
+        ghostTimeoutRef.current = setTimeout(() => {
+            setIsGhostHidden(false)
+        }, 3000) // 3 seconds to allow for the slower title animation
+    }
 
     useEffect(() => {
         // Load saved URLs from electron-store
@@ -228,9 +241,18 @@ function App() {
             >
                 <div className="max-w-2xl mx-auto">
                     <header className="mb-8 flex items-center justify-between draggable">
-                        <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <span className="text-4xl">👻</span>
-                            Phantom
+                        <h1 className="text-2xl font-bold flex items-center gap-2 relative">
+                            <GhostLogo isHidden={isGhostHidden} onTrigger={handleGhostTrigger} />
+                            <span
+                                className="transition-all duration-[1500ms] ease-in-out block"
+                                style={{
+                                    filter: isGhostHidden ? 'blur(10px)' : 'blur(0)',
+                                    opacity: isGhostHidden ? 0 : 1,
+                                    transform: isGhostHidden ? 'scale(1.2) translateY(-10px)' : 'scale(1) translateY(0)'
+                                }}
+                            >
+                                Phantom
+                            </span>
                         </h1>
                         <div className="flex items-center gap-2">
                             <button
