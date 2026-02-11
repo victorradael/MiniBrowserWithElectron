@@ -67,7 +67,7 @@ echo "[3/4] Cleaning up old files..."
 # Install new version
 echo ""
 echo "[4/4] Installing Phantom..."
-REPO="victorradael/MiniBrowserWithElectron"
+REPO="victorradael/phantom"
 curl -fsSL "https://raw.githubusercontent.com/$REPO/master/scripts/install.sh" | bash
 
 echo ""

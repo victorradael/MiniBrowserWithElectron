@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Sparkles, Download, X } from 'lucide-react'
 
-const REPO = 'victorradael/MiniBrowserWithElectron'
+const REPO = 'victorradael/phantom'
 const GITHUB_API = `https://api.github.com/repos/${REPO}/releases/latest`
 
 export default function UpdateNotifier({ currentVersion }) {
